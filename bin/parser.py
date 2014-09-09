@@ -15,55 +15,34 @@ get split up by this program into different list entries.
 import urllib2
 import re
 
-ls = ["http://www.bpmdatabase.com/","search.php?artist=radiohead",
-     "&title=&mix=&bpm=&gid=","&label=&year=&srt=artist&ord=desc"]
-
-example = ''.join(ls)
 
 
 def BPMdatabaseparse(url):
     'Parses all song data on a BPMdatabase.com search page into an array'
 
     page = urllib2.urlopen(url)
-    # page = page.read()
-
-    # print page[:100]
-    # a = re.findall(page, '<html>')
-    # print a
-    # print page
-    linedata = []
 
     for line in page:
-        linedata += re.findall('<tr class="line2">', line)
+        if re.findall('<tr class="line2".*tr>', line):
+            text = re.findall('<tr class="line2".*tr>', line)[0]
+            break
+
+    temp_data = re.split('<tr class', text)
+    temp_data.remove('')
+
+    data = []
+    for d in temp_data:
+        new_data = re.findall('<td>([\w ]+?)</td>', d)
+        data.append(new_data)
 
 
-    print linedata
-    # linedata = ''.join(linedata)
-
-    # data = re.findall('<td>.*td>', linedata)
-    # data = ''.join(data)
-    # data = re.sub('</?tr>|</?td>|<tr class="line[12]">',' ', data)
-    # data = data.rsplit()
-
-    # bandname = data[0]
-    # parsed_data = []
-    # new_entry = []
-    # i = 0
-
-    # while i < len(data):
-    #     if data[i] == bandname:
-    #         if new_entry:
-    #             parsed_data.append(new_entry)
-    #             new_entry = []
-    #     new_entry.append(data[i])
-    #     i += 1
-    # else:
-    #     parsed_data.append(new_entry)
-
-    # return parsed_data
-
+    return data
 
 
 if __name__ == '__main__':
+    ls = ["http://www.bpmdatabase.com/","search.php?artist=radiohead",
+        "&title=&mix=&bpm=&gid=","&label=&year=&srt=artist&ord=desc"]
+
+    example = ''.join(ls)
     data = BPMdatabaseparse(example)
-    # print data[1]
+    print data
