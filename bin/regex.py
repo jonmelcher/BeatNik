@@ -15,3 +15,6 @@ Is there a way to grab each <tr class=...></tr> using regex?
 If possible you can go further and grab each <td></td> inside,
 order them by appearance in source and have your data that way.
 """
+
+# <tr class=(\.+)></tr> will grab all the dots that you wanted to grab.
+# if ... may be empty, then <tr class=(\.*)></tr> will work
