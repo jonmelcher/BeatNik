@@ -22,14 +22,17 @@ def BPMdatabaseparse(url):
 
     page = urllib2.urlopen(url)
 
+    # find the line containing the table of search results
     for line in page:
         if re.findall('<tr class="line2".*tr>', line):
             text = re.findall('<tr class="line2".*tr>', line)[0]
             break
 
+    # split up the search table by row
     temp_data = re.split('<tr class', text)
     temp_data.remove('')
 
+    # collect the column entries for each row
     data = []
     for d in temp_data:
         new_data = re.findall('<td>([\w ]+?)</td>', d)
