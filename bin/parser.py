@@ -51,12 +51,10 @@ def BPMdatabaseParse(url):
     for d in temp_data:
         filled   = re.sub('<td></td>','<td>NULL</td>', d)
         new_data = re.findall('<td>([\w ]+?)</td>', filled)
-        data.append(new_data)
+        if len(new_data) == 7:
+            data.append(new_data)
 
-    #return data if len(data) == 7 else None
-    if len(data) == 7:
-        return data
-    return None
+    return data
 
 
 def BPMdatabaseBandGrab(bandname):
