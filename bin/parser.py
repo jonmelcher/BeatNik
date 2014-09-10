@@ -51,9 +51,10 @@ def BPMdatabaseParse(url):
     for d in temp_data:
         filled   = re.sub('<td></td>','<td>NULL</td>', d)
         new_data = re.findall('<td>([\w ]+?)</td>', filled)
+        
         if len(new_data) == 7:
             data.append(new_data)
-
+            
     return data
 
 
