@@ -19,6 +19,7 @@ Newest Changes:
 
 import urllib2
 import re
+import time
 
 import Classes
 
@@ -54,7 +55,7 @@ def BPMdatabaseParse(url):
         
         if len(new_data) == 7:
             data.append(new_data)
-            
+
     return data
 
 
@@ -81,6 +82,13 @@ def BPMdatabaseBandGrab(bandname):
         num[1]      += 1
         scraped_data = BPMdatabaseParse(rooturl + (''.join(map(str,begin))
               + ''.join(map(str,num)) + "&numBegin=0&artist=" + bandname))
+
+    with open("bandgrablog.txt", "a") as logfile:
+        logfile.write(time.strftime(
+            "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
+        logfile.write("Search http://www.BPMdatabase.com for %s\n" % bandname)
+        for song in songs:
+            logfile.write('\n\n' + ', '.join(song.data))
 
     return songs
 
