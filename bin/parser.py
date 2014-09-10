@@ -18,18 +18,10 @@ Newest Changes:
 
 import urllib2
 import re
-#import classes (Song)
 
-#This class should be in another file.
-class Song(object):
-    'A song.'
+import Classes
 
-    def __init__(self, data):
 
-        self.data   = data
-    def __repr__(self):
-        return repr(self.data)
-        
 
 def BPMdatabaseParse(url):
     'Parses all song data from a page on http://www.BPMdatabase.com.'
@@ -81,7 +73,7 @@ def BPMdatabaseBandGrab(bandname):
           + ''.join(map(str,num)) + "&numBegin=0&artist=" + bandname))
 
     while scraped_data:
-        songs       += [Song(x) for x in scraped_data]
+        songs       += [Classes.Song(x) for x in scraped_data]
         begin[1]    += 10
         num[1]      += 1
         scraped_data = BPMdatabaseParse(rooturl + (''.join(map(str,begin))
