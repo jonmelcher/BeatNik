@@ -88,7 +88,7 @@ def BPMdatabaseBandGrab(bandname):
             "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
         logfile.write("Search http://www.BPMdatabase.com for %s\n" % bandname)
         for song in songs:
-            logfile.write('\n\n' + ', '.join(song.data))
+            logfile.write('\n' + ', '.join(song.data))
 
     return songs
 
@@ -110,6 +110,6 @@ if __name__ == '__main__':
     print BPMdatabaseParse(example3)
     print "Example Results for BPMdatabaseBandGrab:"
     print "Search terms 'Radiohead', 'radiOhead', 'Avril Lavigne', and 'Sum+41'."
-    print BPMdatabaseBandGrab(example1)
-    print BPMdatabaseBandGrab(example2)
-    print BPMdatabaseBandGrab(example3)
+    print BPMdatabaseBandGrab(example4)
+    print BPMdatabaseBandGrab(example5)
+    print BPMdatabaseBandGrab(example6)
