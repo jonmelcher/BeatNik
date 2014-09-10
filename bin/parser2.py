@@ -39,7 +39,7 @@ def BPMdatabaseParse(url):
         if re.findall('<tr class="line2".*tr>', line):
             text = re.findall('<tr class="line2".*tr>', line)[0]
             break
-    if not text:
+    if not text or 'No records found.' in text:
         return None
 
     # split up the search table by row
