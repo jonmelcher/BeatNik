@@ -24,8 +24,8 @@ def BPMdatabaseparse(url):
 
     # find the line containing the table of search results
     for line in page:
+        text = re.findall('<tr class="line2".*tr>', line)[0]
         if re.findall('<tr class="line2".*tr>', line):
-            text = re.findall('<tr class="line2".*tr>', line)[0]
             break
 
     # split up the search table by row
