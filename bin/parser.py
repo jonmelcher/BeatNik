@@ -93,6 +93,17 @@ def BPMdatabaseBandGrab(bandname):
     return songs
 
 
+def BPMdatabaseMultiGrab(bandlist):
+
+    songs = None
+    for band in bandlist:
+        if not songs:
+            songs = BPMdatabaseBandGrab(band)
+        songs += BPMdatabaseBandGrab(band)
+
+    return songs
+
+
 if __name__ == '__main__':
 
     example1 = "http://www.bpmdatabase.com/search.php?begin=0&num=1&numBegin=0&artist=tragically+hip"
@@ -102,6 +113,7 @@ if __name__ == '__main__':
     example5 = "radiOhead"
     example6 = "Avril Lavigne"
     example7 = "Sum+41"
+    example8 = [example1, example2, example3]
 
     print "Example Results for BPMdatabaseParse:"
     print "url for 'tragically+hip', 'tragically Hip', and 'Radiohead'."
@@ -113,3 +125,5 @@ if __name__ == '__main__':
     print BPMdatabaseBandGrab(example4)
     print BPMdatabaseBandGrab(example5)
     print BPMdatabaseBandGrab(example6)
+    print "Example Results for BPMdatabaseMultiGrab:"
+    print BPMdatabaseMultiGrab(example8)
