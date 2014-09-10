@@ -11,6 +11,7 @@ http://www.BPMdatabase.com
 Newest Changes:
 -Added this, please modify below! -J 9/9/14
 
+-Removed Song class and started using Classes.py. -J 9/9/14
 -Fixed bug where BandGrab would continue onto next bandname due to
  manual database access(?).  Replacing spaces with '+' in bandname
  seems to have worked. -J 9/9/14
