@@ -34,16 +34,8 @@ class BPMDB(object):
     'Class BPMDB holds the methods for accessing'
     'http://www.BPMdatabase.com.'
 
-    def __init__(self):
-
-        """
-        Can't think of anything necessary here.
-        Eventually may change to using class 
-        methods, using @classmethod as instances
-        are unneeded.
-        """
-
-    def urlHelper(self, begin, gate, ending):
+    @staticmethod
+    def urlHelper(begin, gate, ending):
 
         'Helper function for BandGrab and LetterGrab'
         'Type: Int -> Bool -> String -> String'
@@ -59,8 +51,8 @@ class BPMDB(object):
 
         return url
 
-
-    def RawTableGrab(self, url):
+    @staticmethod
+    def RawTableGrab(url):
         'Helper function for Alpha/SongParse'
         'Type: String -> String'
 
@@ -79,12 +71,12 @@ class BPMDB(object):
 
         return text
 
-
-    def ArtistParse(self, url):
+    @staticmethod
+    def ArtistParse(url):
         'Parses all bandnames from alphabet browsing results pages'
         'Type: String -> [String]'
 
-        text = self.RawTableGrab(url)
+        text = BPMDB.RawTableGrab(url)
 
         if not text:
             return None
@@ -93,14 +85,14 @@ class BPMDB(object):
 
         return data
 
-
-    def SongParse(self, url):
+    @staticmethod
+    def SongParse(url):
         'Parses all song data from a result page.'
         'Type: String -> [[String]]'
         'Each entry corresponds to Song initialization data.'
         'Refer to Song class for more information.'
 
-        text = self.ParseHelper(url)
+        text = BPMDB.RawTableGrab(url)
 
         if not text or 'No records found.' in text:
             return None
@@ -122,22 +114,22 @@ class BPMDB(object):
 
         return data
 
-
-    def BandGrab(self, bandname):
+    @staticmethod
+    def BandGrab(bandname):
         'Grabs and parses all songs by the band in question'
         'Type: String -> [Song]'
 
         bandname     = bandname.rstrip().replace(' ','+')
         songs        = []
         begin        = 0
-        url          = self.urlHelper(begin, True, bandname)
-        scraped_data = self.SongParse(url)
+        url          = BPMDB.urlHelper(begin, True, bandname)
+        scraped_data = BPMDB.SongParse(url)
 
         while scraped_data:
             songs       += [Classes.Song(x) for x in scraped_data]
             begin       += 10
-            url          = self.urlHelper(begin, True, bandname)
-            scraped_data = self.SongParse(url)
+            url          = BPMDB.urlHelper(begin, True, bandname)
+            scraped_data = BPMDB.SongParse(url)
 
         with open("bandgrablog.txt", "a") as logfile:
 
@@ -151,41 +143,41 @@ class BPMDB(object):
 
         return songs
 
-
-    def BandMultiGrab(self, bandlist):
+    @staticmethod
+    def BandMultiGrab(bandlist):
         'List version of BandGrab'
         'Type: [String] -> [Song]'
 
         songs = None
         for band in bandlist:
             if not songs:
-                songs  = self.BandGrab(band)
+                songs  = BPMDB.BandGrab(band)
             else:
-                songs += self.BandGrab(band)
+                songs += BPMDB.BandGrab(band)
 
         return songs
 
-
-    def LetterGrab(self, value):
+    @staticmethod
+    def LetterGrab(value):
         'Grabs and parses all artists starting with \'value\'.'
         'Type: String -> [String]'
 
         artists      = []
         begin        = 0
-        url          = self.urlHelper(begin, False, value)
+        url          = BPMDB.urlHelper(begin, False, value)
 
-        scraped_data = self.ArtistParse(url)
+        scraped_data = BPMDB.ArtistParse(url)
 
         while scraped_data:
             artists     += scraped_data
             begin       += 25
-            url          = self.urlHelper(begin, False, value)
-            scraped_data = self.ArtistParse(url)
+            url          = BPMDB.urlHelper(begin, False, value)
+            scraped_data = BPMDB.ArtistParse(url)
 
         return artists
 
-
-    def Crawl(self):
+    @staticmethod
+    def Crawl():
         'Uses above methods to crawl http://www.BPMdatabase.com.'
         'Type: Void -> [Song]'
 
@@ -201,18 +193,20 @@ class BPMDB(object):
         for letter in alphanumeric:
             print letter
             if not artists:
-                artists = self.LetterGrab(letter)
+                artists = BPMDB.LetterGrab(letter)
             else: 
-                artists += self.LetterGrab(letter)
+                artists += BPMDB.LetterGrab(letter)
         print artists
         print 'Finding songs...'
-        return self.BandMultiGrab(artists)
+        return BPMDB.BandMultiGrab(artists)
 
 
 
 if __name__ == '__main__':
-    X = BPMDB()
+
     example_url = 'http://www.bpmdatabase.com/search.php?artist=radiohead&title=&mix=&bpm=&gid=&label=&year=&srt=artist&ord=asc'
 
-    results = X.SongParse(example_url)
+    results = BPMDB.SongParse(example_url)
+    crawl   = BPMDB.Crawl()
     print results[0]
+    print crawl
