@@ -38,15 +38,19 @@ class BPMDB(object):
 
         """
         Can't think of anything necessary here.
-        Eventually may change to using class
+        Eventually may change to using class 
         methods, using @classmethod as instances
         are unneeded.
         """
 
-    def ParseHelper(self, url):
+    def RawTableGrab(self, url):
         'Helper function for Alpha/SongParse'
         'Type: String -> String'
 
+        """
+        Accesses search results page from http://www.BPMdatabase.com.
+        And parses out raw table data from HTML source.
+        """
         page = urllib2.urlopen(url)
         text = []
 
@@ -63,7 +67,7 @@ class BPMDB(object):
         'Parses all bandnames from alphabet browsing results pages'
         'Type: String -> [String]'
 
-        text = self.ParseHelper(url)
+        text = self.RawTableGrab(url)
 
         if not text:
             return None
@@ -94,7 +98,6 @@ class BPMDB(object):
         data = []
         for d in temp_data:
             filled   = re.sub("<td></td>", "<td>NULL</td>", d)
-            # print filled
             new_data = re.findall("<td>(.*?)</td>", filled)
 
             if len(new_data) == 7:
@@ -173,7 +176,7 @@ class BPMDB(object):
 
         """
         Note that bandgrablog.txt will list all song information.
-        Warning: this will crawl the entire website and may take
+        Warning: this will crawl the entire website and may take 
         time and resources.
         """
         alphanumeric = ''   #This is where 0-9A-Z goes
@@ -184,7 +187,7 @@ class BPMDB(object):
             print letter
             if not artists:
                 artists = self.LetterGrab(letter)
-            else:
+            else: 
                 artists += self.LetterGrab(letter)
         print artists
         print 'Finding songs...'
