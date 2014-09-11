@@ -12,7 +12,10 @@ Newest Changes:
 -Added this, please modify below! -J 9/9/14
 
 -Major overhaul, made a class for BPMdatabase methods, will trans-
- fer over to Classes.py.  -J 9/10/14
+ fer over to Classes.py. Full crawl should work now, had to edit
+ regular expressions in SongParse for weird characters in bandnames
+ etc. if there is a more succinct way of writing those expressions
+ please change.  -J 9/10/14
 -Removed Song class and started using Classes.py. -J 9/9/14
 -Fixed bug where BandGrab would continue onto next bandname due to
  manual database access(?).  Replacing spaces with '+' in bandname
@@ -32,9 +35,13 @@ class BPMDB(object):
     'http://www.BPMdatabase.com.'
 
     def __init__(self):
-        #Can't think of anything necessary here.
-        return
 
+        """
+        Can't think of anything necessary here.
+        Eventually may change to using class 
+        methods, using @classmethod as instances
+        are unneeded.
+        """
 
     def ParseHelper(self, url):
         'Helper function for Alpha/SongParse'
@@ -52,12 +59,6 @@ class BPMDB(object):
         return text
 
 
-    def _AP_Helper(self, matchobject):
-        'Helper function for ArtistParse.'
-        'Converts %[0-9][A-F] to corresponding ASCII Char.'
-        return urllib2.unquote(matchobject.group(0))
-
-
     def ArtistParse(self, url):
         'Parses all bandnames from alphabet browsing results pages'
         'Type: String -> [String]'
@@ -68,8 +69,7 @@ class BPMDB(object):
             return None
 
         data = re.findall('artist=(.+?)"', text)
-        for i, artist in enumerate(data):
-            data[i] = re.sub('%[0-9|A-F][0-9|A-F]', self._AP_Helper, artist)
+
         return data
 
 
@@ -86,14 +86,15 @@ class BPMDB(object):
 
         # Splits up the search results table by row.
         temp_data = re.split('<tr class="line[12]">', text)
-        temp_data.remove('')
+        if '' in temp_data:
+            temp_data.remove('')
 
         # Collects the column entries from each row.
         # Replaces empty column entries with 'NULL'.
         data = []
         for d in temp_data:
-            filled   = re.sub('<td></td>','<td>NULL</td>', d)
-            new_data = re.findall('<td>([\w ]+?)</td>', filled)
+            filled   = re.sub("<td></td>", "<td>NULL</td>", d)
+            new_data = re.findall("<td>([\w!'%$&-*. ]+?)</td>", filled)
             
             if len(new_data) == 7:
                 data.append(new_data)
@@ -108,19 +109,16 @@ class BPMDB(object):
         bandname = bandname.rstrip().replace(' ','+')
         songs    = []
         begin    = ['?begin=', 0]
-        num      = ['&num='  , 1]
-        rooturl  = "http://www.bpmdatabase.com/search.php"
+        rooturl  = "http://www.bpmdatabase.com/browse.php"
 
-        # If you can find a better way to represent the variable URL use it.
         scraped_data = self.SongParse(rooturl + (''.join(map(str,begin))
-              + ''.join(map(str,num)) + "&numBegin=0&artist=" + bandname))
+                                              + "&artist="  + bandname))
 
         while scraped_data:
             songs       += [Classes.Song(x) for x in scraped_data]
             begin[1]    += 10
-            num[1]      += 1
             scraped_data = self.SongParse(rooturl + (''.join(map(str,begin))
-                  + ''.join(map(str,num)) + "&numBegin=0&artist=" + bandname))
+                                                  +  "&artist=" + bandname))
 
         with open("bandgrablog.txt", "a") as logfile:
             logfile.write(time.strftime(
@@ -132,21 +130,65 @@ class BPMDB(object):
         return songs
 
 
-    def MultiGrab(self, bandlist):
-        'List version of BPMdatabaseBandGrab'
+    def BandMultiGrab(self, bandlist):
+        'List version of BandGrab'
         'Type: [String] -> [Song]'
 
         songs = None
         for band in bandlist:
             if not songs:
                 songs = self.BandGrab(band)
-            songs += self.BandGrab(band)
+            else:
+                songs += self.BandGrab(band)
 
         return songs
 
 
+    def LetterGrab(self, value):
+        'Grabs and parses all artists starting with \'value\'.'
+        'Type: String -> [String]'
+
+        artists = []
+        begin = ["?begin=", 0]
+        letter = '&letter='
+        rooturl = "http://www.bpmdatabase.com/browse.php"
+
+        scraped_data = self.ArtistParse(rooturl + ''.join(map(str, begin)) +
+                                                          letter + value)
+
+        while scraped_data:
+            artists += scraped_data
+            begin[1] += 25
+            scraped_data = self.ArtistParse(rooturl +
+                           ''.join(map(str, begin)) +
+                                    letter + value)
+
+        return artists
+
+
     def Crawl(self):
-        return
+        'Uses above methods to crawl http://www.BPMdatabase.com.'
+        'Type: Void -> [Song]'
+
+        """
+        Note that bandgrablog.txt will list all song information.
+        Warning: this will crawl the entire website and may take 
+        time and resources.
+        """
+        alphanumeric = ''   #This is where 0-9A-Z goes
+        artists = None
+        songs = None
+
+        for letter in alphanumeric:
+            print letter
+            if not artists:
+                artists = self.LetterGrab(letter)
+            else: 
+                artists += self.LetterGrab(letter)
+        print artists
+        print 'Finding songs...'
+        return self.BandMultiGrab(artists)
+
 
 
 if __name__ == '__main__':
