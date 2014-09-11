@@ -2,7 +2,9 @@
 This file contains the classes for the BeatNik project.
 
 Newest Changes:
+	-Copied BPMBD class over from parser.py, removed Class module dependencies -J 9/11/14
 	-Created file - J 9/9/14
+	
 """
 
 class Song(object):
