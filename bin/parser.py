@@ -11,6 +11,7 @@ http://www.BPMdatabase.com
 Newest Changes:
 -Added this, please modify below! -J 9/9/14
 
+-Changed BPMDB methods to static, removed instantiation - J 9/11/14
 -Major overhaul, made a class for BPMdatabase methods, will trans-
  fer over to Classes.py. Full crawl should work now, had to edit
  regular expressions in SongParse for weird characters in bandnames
@@ -196,6 +197,7 @@ class BPMDB(object):
                 artists = BPMDB.LetterGrab(letter)
             else: 
                 artists += BPMDB.LetterGrab(letter)
+
         print artists
         print 'Finding songs...'
         return BPMDB.BandMultiGrab(artists)
