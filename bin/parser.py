@@ -52,6 +52,12 @@ class BPMDB(object):
         return text
 
 
+    def _AP_Helper(self, matchobject):
+        'Helper function for ArtistParse.'
+        'Converts %[0-9][A-F] to corresponding ASCII Char.'
+        return urllib2.unquote(matchobject.group(0))
+
+
     def ArtistParse(self, url):
         'Parses all bandnames from alphabet browsing results pages'
         'Type: String -> [String]'
@@ -63,13 +69,7 @@ class BPMDB(object):
 
         data = re.findall('artist=(.+?)"', text)
         for i, artist in enumerate(data):
-            while '%' in artist:
-                pct = artist.index('%')
-                new = data[i][pct+1:pct+3].decode("hex")
-                print new
-                data[i] = data[i][:pct] + new + data[i][pct+3:]
-                print data[i]
-
+            data[i] = re.sub('%[0-9|A-F][0-9|A-F]', self._AP_Helper, artist)
         return data
 
 
@@ -150,26 +150,4 @@ class BPMDB(object):
 
 
 if __name__ == '__main__':
-
     X = BPMDB()
-    example1 = "http://www.bpmdatabase.com/search.php?begin=0&num=1&numBegin=0&artist=tragically+hip"
-    example2 = "http://www.bpmdatabase.com/search.php?begin=0&num=1&numBegin=0&artist=tragically Hip"
-    example3 = "http://www.bpmdatabase.com/search.php?begin=0&num=1&numBegin=0&artist=Radiohead"
-    example4 = "Radiohead"
-    example5 = "radiOhead"
-    example6 = "Avril Lavigne"
-    example7 = "Sum+41"
-    example8 = [example1, example2, example3]
-
-    print "Example Results for BPMdatabaseParse:"
-    print "url for 'tragically+hip', 'tragically Hip', and 'Radiohead'."
-    print X.SongParse(example1)
-    print X.SongParse(example2)
-    print X.SongParse(example3)
-    print "Example Results for BPMdatabaseBandGrab:"
-    print "Search terms 'Radiohead', 'radiOhead', 'Avril Lavigne', and 'Sum+41'."
-    print X.BandGrab(example4)
-    print X.BandGrab(example5)
-    print X.BandGrab(example6)
-    print "Example Results for BPMdatabaseMultiGrab:"
-    print X.MultiGrab(example8)
