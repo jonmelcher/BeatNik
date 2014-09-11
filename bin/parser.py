@@ -43,12 +43,29 @@ class BPMDB(object):
         are unneeded.
         """
 
+    def urlHelper(self, begin, gate, ending):
+
+        'Helper function for BandGrab and LetterGrab'
+        'Type: Int -> Bool -> String -> String'
+
+        """
+        Updates url for next parse in BandGrab and LetterGrab.
+        """
+
+        rooturl = "http://www.bpmdatabase.com/browse.php?begin="
+        query   = "&artist=" if gate else "&letter="
+        url     = rooturl
+        url    += ("%s%s%s" % (begin, query, ending))
+
+        return url
+
+
     def RawTableGrab(self, url):
         'Helper function for Alpha/SongParse'
         'Type: String -> String'
 
         """
-        Accesses search results page from http://www.BPMdatabase.com.
+        Accesses search results page from http://www.BPMdatabase.com
         And parses out raw table data from HTML source.
         """
         page = urllib2.urlopen(url)
@@ -110,24 +127,25 @@ class BPMDB(object):
         'Grabs and parses all songs by the band in question'
         'Type: String -> [Song]'
 
-        bandname = bandname.rstrip().replace(' ','+')
-        songs    = []
-        begin    = ['?begin=', 0]
-        rooturl  = "http://www.bpmdatabase.com/browse.php"
-
-        scraped_data = self.SongParse(rooturl + (''.join(map(str,begin))
-                                              + "&artist="  + bandname))
+        bandname     = bandname.rstrip().replace(' ','+')
+        songs        = []
+        begin        = 0
+        url          = self.urlHelper(begin, True, bandname)
+        scraped_data = self.SongParse(url)
 
         while scraped_data:
             songs       += [Classes.Song(x) for x in scraped_data]
-            begin[1]    += 10
-            scraped_data = self.SongParse(rooturl + (''.join(map(str,begin))
-                                                  +  "&artist=" + bandname))
+            begin       += 10
+            url          = self.urlHelper(begin, True, bandname)
+            scraped_data = self.SongParse(url)
 
         with open("bandgrablog.txt", "a") as logfile:
+
             logfile.write(time.strftime(
                 "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
-            logfile.write("Search http://www.BPMdatabase.com for %s\n" % bandname)
+            logfile.write(
+                "Search http://www.BPMdatabase.com for %s\n" % bandname)
+
             for song in songs:
                 logfile.write('\n' + ', '.join(song.data))
 
@@ -141,7 +159,7 @@ class BPMDB(object):
         songs = None
         for band in bandlist:
             if not songs:
-                songs = self.BandGrab(band)
+                songs  = self.BandGrab(band)
             else:
                 songs += self.BandGrab(band)
 
@@ -152,20 +170,17 @@ class BPMDB(object):
         'Grabs and parses all artists starting with \'value\'.'
         'Type: String -> [String]'
 
-        artists = []
-        begin = ["?begin=", 0]
-        letter = '&letter='
-        rooturl = "http://www.bpmdatabase.com/browse.php"
+        artists      = []
+        begin        = 0
+        url          = self.urlHelper(begin, False, value)
 
-        scraped_data = self.ArtistParse(rooturl + ''.join(map(str, begin)) +
-                                                          letter + value)
+        scraped_data = self.ArtistParse(url)
 
         while scraped_data:
-            artists += scraped_data
-            begin[1] += 25
-            scraped_data = self.ArtistParse(rooturl +
-                           ''.join(map(str, begin)) +
-                                    letter + value)
+            artists     += scraped_data
+            begin       += 25
+            url          = self.urlHelper(begin, False, value)
+            scraped_data = self.ArtistParse(url)
 
         return artists
 
@@ -179,9 +194,9 @@ class BPMDB(object):
         Warning: this will crawl the entire website and may take 
         time and resources.
         """
-        alphanumeric = ''   #This is where 0-9A-Z goes
-        artists = None
-        songs = None
+        alphanumeric = '3'   #This is where 0-9A-Z goes
+        artists      = None
+        songs        = None
 
         for letter in alphanumeric:
             print letter
