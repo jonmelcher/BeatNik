@@ -43,10 +43,14 @@ class BPMDB(object):
         are unneeded.
         """
 
-    def ParseHelper(self, url):
+    def RawTableGrab(self, url):
         'Helper function for Alpha/SongParse'
         'Type: String -> String'
 
+        """
+        Accesses search results page from http://www.BPMdatabase.com.
+        And parses out raw table data from HTML source.
+        """
         page = urllib2.urlopen(url)
         text = []
     
@@ -63,7 +67,7 @@ class BPMDB(object):
         'Parses all bandnames from alphabet browsing results pages'
         'Type: String -> [String]'
 
-        text = self.ParseHelper(url)
+        text = self.RawTableGrab(url)
 
         if not text:
             return None
@@ -79,7 +83,7 @@ class BPMDB(object):
         'Each entry corresponds to Song initialization data.'
         'Refer to Song class for more information.'
 
-        text = self.ParseHelper(url)
+        text = self.RawTableGrab(url)
                 
         if not text or 'No records found.' in text:
             return None
@@ -94,7 +98,7 @@ class BPMDB(object):
         data = []
         for d in temp_data:
             filled   = re.sub("<td></td>", "<td>NULL</td>", d)
-            new_data = re.findall("<td>([\w!'%$&-*. ]+?)</td>", filled)
+            new_data = re.findall("<td>(.*?)</td>", filled)
             
             if len(new_data) == 7:
                 data.append(new_data)
