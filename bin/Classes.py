@@ -221,3 +221,6 @@ class BPMDB(object):
         print artists
         print 'Finding songs...'
         return BPMDB.BandMultiGrab(artists)
+
+if __name__ == '__main__':
+    pass
