@@ -3,6 +3,7 @@ This file contains the crawlers for the BeatNik project, as well as the
 Song class.
 
 Newest Changes:
+    -Added AudioKC class, needs to be tested more diligently. -J 9/11/14
     -Changed style to be more pythonic.
     -Copied BPMBD class over from parser.py, removed Class module depen-
      dencies. -J 9/11/14
@@ -245,26 +246,6 @@ class AudioKC(object):
     'AudioKC class holds the methods for accessing'
     'http://www.audiokeychain.com'
 
-    crawl_genres = [
-        'pop'   , 'rock'   , 'hip+hop'   , 'house'        , 'r%26b'     ,
-        'dance' , 'rap'    , 'country'   , 'electronic'   , 'blues'     ,
-        'trance', 'dubstep', 'other'     , 'soul'         , 'gospel'    ,
-        'punk'  , 'reggae' , 'folk'      , 'techno'       , 'remix'     ,
-        'club'  , 'funk'   , 'soundtrack','electronica'   , 'jazz'      ,
-        'grime' , 'emo'    , 'electro'   , 'drum+and+bass', 'indie+rock',
-        'latin' , 'bachata','dancehall'  ,'electro+house' , 'dancehall' ,
-        'edm'   , 'trap'   , 'indie'     , 'christian+rap', 'reggaeton' ,
-        'singer-songwriter', 'christian' , 'disco'        , 'new+age'   ,
-        'progressive+house', 'eurodance' , 'alternative'  , 'classical' ,
-        'rap/hip-hop'      , 'synthpop'  , 'indie+pop'    , 'boy+band'  ,
-        'worship+music'    , 'comedy'    , 'post-hardcore', 'crunk'     ,
-        'alternative+rock' ,  'metal'    , 'hip+hop/rap'  , 'hardstyle' ,
-        'swedish+house'    , 'industrial', 'heavy+metal'  , 'kulemina'  ,
-        'electropop'       , 'big+beat'  , 'electropop'   , 'ambient'   ,
-        'soca', 'kpop'     , 'anime'     , 'lmp'          , 'minimal'   ,
-        'pony'
-                    ]
-
     @staticmethod
     def url_helper(genre, page_number):
         'Helper function for crawl'
@@ -308,31 +289,54 @@ class AudioKC(object):
         return songs
 
     @staticmethod
-    def crawl(genres = AudioKC.crawl_genres[0:2]):
+    def crawl(lower, upper):
         'Scrapes all song data from http://audiokeychain.com within'
-        'specified genres. Type: [String] -> [Song].'
+        'specified genres. Type: Int -> Int -> [Song].'
 
         """
         Select slice of crawl_genres (must be list) to crawl that portion
         of the genres on the website.
         """
-        songs = set([])
+        crawl_genres = [
+        'pop'   , 'rock'   , 'hip+hop'   , 'house'        , 'r%26b'     ,
+        'dance' , 'rap'    , 'country'   , 'electronic'   , 'blues'     ,
+        'trance', 'dubstep', 'other'     , 'soul'         , 'gospel'    ,
+        'punk'  , 'reggae' , 'folk'      , 'techno'       , 'remix'     ,
+        'club'  , 'funk'   , 'soundtrack','electronica'   , 'jazz'      ,
+        'grime' , 'emo'    , 'electro'   , 'drum+and+bass', 'indie+rock',
+        'latin' , 'bachata','dancehall'  ,'electro+house' , 'dancehall' ,
+        'edm'   , 'trap'   , 'indie'     , 'christian+rap', 'reggaeton' ,
+        'singer-songwriter', 'christian' , 'disco'        , 'new+age'   ,
+        'progressive+house', 'eurodance' , 'alternative'  , 'classical' ,
+        'rap/hip-hop'      , 'synthpop'  , 'indie+pop'    , 'boy+band'  ,
+        'worship+music'    , 'comedy'    , 'post-hardcore', 'crunk'     ,
+        'alternative+rock' ,  'metal'    , 'hip+hop/rap'  , 'hardstyle' ,
+        'swedish+house'    , 'industrial', 'heavy+metal'  , 'kulemina'  ,
+        'electropop'       , 'big+beat'  , 'electropop'   , 'ambient'   ,
+        'soca', 'kpop'     , 'anime'     , 'lmp'          , 'minimal'   ,
+        'pony'
+                    ]
 
+        genres = crawl_genres[lower:upper]
+        songs  = []
         for genre in genres:
             print 'Beginning to scrape genre %s.' % (genre)
-            page_number = 1
-            songs_size  = len(songs)
-            #Updates songs with [Song] result from parsing first page.
-            first_page  = AudioKC.page_parse(AudioKC.url_helper(genre,
-                                                         page_number))
-            songs.update(first_page)
+            #Initializes songs with [Song] result from parsing first page.
+            previous_size = len(songs)
+            previous_page = None
+            page_number   = 1
+            next_page     = AudioKC.page_parse(AudioKC.url_helper(genre,
+                                                           page_number))
+            songs        += next_page
 
-            while len(songs) != songs_size:
+            while next_page  != previous_page:
                 print "Scraped page %s for genre %s" % (page_number, genre)
-                songs_size   = len(songs)
-                page_number += 1
-                next_page    = AudioKC.page_parse(AudioKC.url_helper(genre,
-                                                              page_number))
-                songs.update(next_page)
+                songs_size    = len(songs)
+                print "Scraped a total of %s songs." % (songs_size)
+                page_number  += 1
+                previous_page = next_page
+                next_page     = AudioKC.page_parse(AudioKC.url_helper(genre,
+                                                               page_number))
+                songs += next_page
 
-        return list(songs)
+        return songs
