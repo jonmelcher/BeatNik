@@ -68,35 +68,8 @@ if __name__ == '__main__':
 
     my_song_data = ['Radiohead', 'Time of my life', 'The Very Best of Neil Young', 9001, 'Electronic', 'Spam Recording Inc', 2015]
 
-    for i, d in enumerate(my_song_data):
-        if isinstance(d, str):
-           my_song_data[i] = d.replace(' ', '')
     my_song = Song(my_song_data)
 
-    # print my_song.artist, my_song.title, my_song.label, my_song.year
 
     db.insert_song(my_song, table_name)
 
-
-        # self.artist   = song_data[0]
-        # self.title    = song_data[1]
-        # self.album    = song_data[2]
-        # self.BPM      = song_data[3]
-        # self.genre    = song_data[4]
-        # self.label    = song_data[5]
-        # self.year     = song_data[6]
-
-
-# conn = sqlite3.connect('bpmdatabase.db')
-
-
-# create_new_table = False
-# if create_new_table:
-
-# c.execute('''INSERT INTO songs VALUES
-#              ('Fake Plastic Trees', 'Radiohead', 'NULL', 74, 'NULL', 'Capitol Records', 1995)''')
-
-# conn.commit()
-
-# # make sure to close cursors
-# c.close()
