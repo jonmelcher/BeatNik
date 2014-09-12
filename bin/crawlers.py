@@ -8,6 +8,10 @@ Newest Changes:
      dencies. -J 9/11/14
     -Created file - J 9/9/14
 """
+import urllib2
+import re
+import time
+
 
 class Song(object):
     'Song Class is for formatting and maintaining song data.'
@@ -22,6 +26,7 @@ class Song(object):
         self.genre    = None
         self.label    = None
         self.year     = None
+        self.key      = None
         self.playlist = []
 
 
@@ -35,6 +40,7 @@ class Song(object):
         self.genre  = self.data[4]
         self.label  = self.data[5]
         self.year   = self.data[6]
+        self.key    = self.data[7]
 
 
     def change_to(self, index, new_value):
@@ -58,7 +64,6 @@ class BPMDB(object):
 
     @staticmethod
     def url_helper(begin, gate, ending):
-
         'Helper function for band_grab and letter_grab'
         'Type: Int -> Bool -> String -> String'
 
@@ -83,7 +88,7 @@ class BPMDB(object):
         And scrapes out raw table data from HTML source.
         """
         page = urllib2.urlopen(url)
-        text = []
+        text = ""
 
         # Finds the line containing the table of search results.
         for line in page:
@@ -230,6 +235,14 @@ class AudioKC(object):
     'http://www.audiokeychain.com'
 
     @staticmethod
+    def url_helper(genre, page_number):
+        'Helper function for crawl'
+        rooturl = "http://www.audiokeychain.com/database?genre[]="
+        url     = rooturl + "%s&page=%s" % (genre, page_number)
+        return url
+
+
+    @staticmethod
     def raw_table_grab(url):
         """
         Accesses search results page from http://www.audiokeychain.com
@@ -240,8 +253,46 @@ class AudioKC(object):
 
         # Finds the line containing the table of search results.
         for line in page:
-            if re.findall('<span class="title">', line):
-                text += re.findall('<tr class="line2".*tr>', line)[0]
-                break
+            if '<span class="title"' in line:
+                text.append([line] + [page.next() for i in range(3)])
+        return text[1:]
 
-        return text
+    @staticmethod
+    def page_parse(url):
+        'Parses raw_table_grab(url) and returns list of Song objects'
+        'Type: String -> [Song]'
+        text = AudioKC.raw_table_grab(url)
+        songs = []
+        for raw_song_data in text:
+            concatenated_song = ''.join(raw_song_data)
+            song_data = re.findall('<span class="[takb][^"]*?">(.*?)<',
+                                                     concatenated_song)
+            #song_data is in the form [title, artist, key, bpm] so must
+            #convert to a valid form for Song class.
+            formatted_song_data = [song_data[1], song_data[0], 'NULL',
+                                   song_data[3],    'Null'   , 'Null',
+                                      'Null'   , song_data[2]]
+            songs.append(Song(formatted_song_data))
+        return songs
+
+    @staticmethod
+    def crawl(genres = ['metal']):
+        'Scrapes all song data from http://audiokeychain.com within'
+        'specified genres. Type: [String] -> Int -> [Song].'
+        songs = [[]]
+
+        for genre in genres:
+            page_number = 1
+            songs_size  = len(songs)
+            #Unions songs with [Song] result from parsing first page.
+            songs.union(AudioKC.page_parse(AudioKC.url_helper(genre,
+                                                      page_number)))
+
+            while len(songs) != songs_size:
+                songs_size = len(songs)
+                page_number += 1
+                next_page = AudioKC.page_parse(AudioKC.url_helper(genre,
+                                                           page_number))
+                songs.union(next_page)
+                print page_number
+        return songs
