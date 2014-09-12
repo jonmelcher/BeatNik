@@ -1,6 +1,7 @@
 """
 This file contains the scrapers for the BeatNik project, as well as the
-Song class.
+Song class.  An example for a song instance:
+Song( ['The Click Five', 'Jenny', 'NULL', '96.00', 'Null', 'Null', 'Null', '3B / Db'] )
 
 Newest Changes:
     -Added AudioKC class, needs to be tested more diligently. -J 9/11/14
