@@ -170,7 +170,7 @@ class BPMDB(object):
             url          = BPMDB.url_helper(begin, True, bandname)
             scraped_data = BPMDB.song_parse(url)
 
-        with open("band_grablog.txt", "a") as logfile:
+        with open("scrapelog.txt", "a") as logfile:
 
             logfile.write(time.strftime(
                 "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
@@ -221,7 +221,7 @@ class BPMDB(object):
         'Type: Void -> [Song]'
 
         """
-        Note that band_grablog.txt will list all song information.
+        Note that scrapelog.txt will list all song information.
         Warning: this will crawl the entire website and may take
         time and resources.
         """
@@ -330,7 +330,7 @@ class AudioKC(object):
             songs        += next_page
 
             while next_page  != previous_page:
-                print "Scraped page %s for genre %s" % (page_number, genre)
+                print "Scraped page %s for %s genre." % (page_number, genre)
                 songs_size    = len(songs)
                 print "Scraped a total of %s songs." % (songs_size)
                 page_number  += 1
@@ -338,5 +338,15 @@ class AudioKC(object):
                 next_page     = AudioKC.page_parse(AudioKC.url_helper(genre,
                                                                page_number))
                 songs += next_page
+
+        with open("scrapelog.txt", "a") as logfile:
+
+            logfile.write(time.strftime(
+                "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
+            logfile.write(
+                "Searched http://www.audiokeychain.com for the following:\n")
+
+            for song in songs:
+                logfile.write('\n' + ', '.join(song.data))
 
         return songs
