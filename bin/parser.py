@@ -184,7 +184,7 @@ class BPMDB(object):
 
         """
         Note that bandgrablog.txt will list all song information.
-        Warning: this will crawl the entire website and may take 
+        Warning: this will crawl the entire website and may take
         time and resources.
         """
         alphanumeric = '3'   #This is where 0-9A-Z goes
@@ -195,7 +195,7 @@ class BPMDB(object):
             print letter
             if not artists:
                 artists = BPMDB.LetterGrab(letter)
-            else: 
+            else:
                 artists += BPMDB.LetterGrab(letter)
 
         print artists
@@ -209,6 +209,6 @@ if __name__ == '__main__':
     example_url = 'http://www.bpmdatabase.com/search.php?artist=radiohead&title=&mix=&bpm=&gid=&label=&year=&srt=artist&ord=asc'
 
     results = BPMDB.SongParse(example_url)
-    crawl   = BPMDB.Crawl()
+    # crawl   = BPMDB.Crawl()
     print results[0]
-    print crawl
+    # print crawl

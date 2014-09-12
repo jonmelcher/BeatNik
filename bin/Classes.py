@@ -4,7 +4,7 @@ This file contains the classes for the BeatNik project.
 Newest Changes:
 	-Copied BPMBD class over from parser.py, removed Class module dependencies -J 9/11/14
 	-Created file - J 9/9/14
-	
+
 """
 
 class Song(object):
@@ -204,7 +204,7 @@ class BPMDB(object):
 
         """
         Note that bandgrablog.txt will list all song information.
-        Warning: this will crawl the entire website and may take 
+        Warning: this will crawl the entire website and may take
         time and resources.
         """
         alphanumeric = '3'   #This is where 0-9A-Z goes
@@ -215,7 +215,7 @@ class BPMDB(object):
             print letter
             if not artists:
                 artists = BPMDB.LetterGrab(letter)
-            else: 
+            else:
                 artists += BPMDB.LetterGrab(letter)
 
         print artists
