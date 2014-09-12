@@ -53,7 +53,7 @@ class Song(object):
 
 class BPMDB(object):
 
-    'Class BPMDB holds the methods for accessing'
+    'BPMDB class contains the methods for accessing'
     'http://www.BPMdatabase.com.'
 
     @staticmethod
@@ -80,7 +80,7 @@ class BPMDB(object):
 
         """
         Accesses search results page from http://www.BPMdatabase.com
-        And parses out raw table data from HTML source.
+        And scrapes out raw table data from HTML source.
         """
         page = urllib2.urlopen(url)
         text = []
@@ -222,3 +222,26 @@ class BPMDB(object):
         print artists
         print 'Finding songs...'
         return BPMDB.band_multi_grab(artists)
+
+
+
+class AudioKC(object):
+    'AudioKC class holds the methods for accessing'
+    'http://www.audiokeychain.com'
+
+    @staticmethod
+    def raw_table_grab(url):
+        """
+        Accesses search results page from http://www.audiokeychain.com
+        And scrapes out pertinent raw table data from HTML source.
+        """
+        page = urllib2.urlopen(url)
+        text = []
+
+        # Finds the line containing the table of search results.
+        for line in page:
+            if re.findall('<span class="title">', line):
+                text += re.findall('<tr class="line2".*tr>', line)[0]
+                break
+
+        return text
