@@ -99,9 +99,25 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 87.0,
+		"height": 47.0,
 		"selected_items":
 		[
+			[
+				"c#",
+				"Set Syntax: C#"
+			],
+			[
+				"latex",
+				"Set Syntax: LaTeX"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"spaces",
+				"Indentation: Convert to Spaces"
+			],
 			[
 				"sypy",
 				"Set Syntax: Python"
@@ -129,10 +145,6 @@
 			[
 				"Package Control: ",
 				"Package Control: Disable Package"
-			],
-			[
-				"inst",
-				"Package Control: Install Package"
 			],
 			[
 				"lint",
@@ -171,6 +183,17 @@
 	],
 	"file_history":
 	[
+		"/Users/kayak/Google Drive/Programming/projects/BeatNik/bin/parser.py",
+		"/Users/kayak/Google Drive/Programming/projects/BeatNik/bin/Classes.py",
+		"/Users/kayak/Google Drive/Programming/projects/BeatNik/bin/sqlgrab.py",
+		"/Users/kayak/Google Drive/Programming/projects/BeatNik/databasetools/sqldump.py",
+		"/Users/kayak/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/kayak/Google Drive/Programming/projects/BeatNik/bin/parser2.py",
+		"/Users/kayak/Google Drive/Programming/projects/BeatNik/bin/temp_parser.py",
+		"/Users/kayak/Google Drive/Programming/projects/BeatNik/temp_parser.py",
+		"/Users/kayak/Google Drive/Programming/projects/BeatNik/.gitignore",
+		"/Users/kayak/Google Drive/Programming/projects/BeatNik/.gitattributes",
+		"/Users/kayak/Google Drive/Programming/projects/BeatNik/readme.txt",
 		"/Users/kayak/Google Drive/Programming/projects/rosalind/data/sample_dna.txt",
 		"/Users/kayak/Google Drive/Programming/projects/rosalind/solutions/DNA.py",
 		"/Users/kayak/Google Drive/Programming/projects/rosalind/data/dna_sample.txt",
@@ -196,7 +219,6 @@
 		"/Users/kayak/Google Drive/Programming/projects/rosalind/solutions/longest_common_substring.py",
 		"/Users/kayak/Google Drive/Programming/projects/rosalind/solutions/locating_restriction_sites.py",
 		"/Users/kayak/Google Drive/Programming/projects/rosalind/rosalind/genetools.py",
-		"/Users/kayak/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
 		"/Users/kayak/Library/Application Support/Sublime Text 3/Packages/User/Default (OSX).sublime-keymap",
 		"/Users/kayak/Google Drive/Programming/projects/rosalind/bin/open_reading_frames.py",
 		"/Users/kayak/Google Drive/Programming/projects/rosalind/rosalind/codon_table.py",
@@ -288,21 +310,11 @@
 		"/Users/kayak/Google Drive/Programming/projects/project_euler/bin/problem_1.py",
 		"/Users/kayak/Google Drive/Programming/projects/project_euler/bin/problem43.py",
 		"/Users/kayak/Google Drive/Programming/projects/project_euler/proj_eul.egg-info/PKG-INFO",
-		"/Users/kayak/Google Drive/Programming/projects/project_euler/bin/problem41.py",
-		"/Users/kayak/Google Drive/Programming/projects/test_files/generators.py",
-		"/Users/kayak/Google Drive/Programming/projects/project_euler/bin/problem35.py",
-		"/Users/kayak/Google Drive/Programming/projects/project_euler/bin/problem49.py",
-		"/Users/kayak/Google Drive/Programming/projects/project_euler/bin/problem_2.py",
-		"/Users/kayak/Google Drive/Programming/projects/project_euler/dist/proj_eul-0.1-py2.7.egg",
-		"/Users/kayak/Google Drive/Programming/projects/project_euler/self_contained_solutions/problem_41.py",
-		"/Users/kayak/Google Drive/Programming/projects/project_euler/bin/understanding_yield.py",
-		"/Users/kayak/Google Drive/Programming/projects/project_euler/bin/problem5.py",
-		"/Users/kayak/Google Drive/Programming/projects/project_euler/bin/problem4.py",
-		"/Users/kayak/Google Drive/Programming/projects/project_euler/proj_eul/string_tools/__init__.py"
+		"/Users/kayak/Google Drive/Programming/projects/project_euler/bin/problem41.py"
 	],
 	"find":
 	{
-		"height": 25.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -317,6 +329,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			", ",
+			"__url__getter__",
+			"'?begin=%s?num=%s&numBegin=0&artist=%s' % (begin, num, bandname)",
+			"<tr class=\"line[12]\">",
+			"data",
+			"tab",
+			"page",
 			"potential_end_matches",
 			"potential_beg_matches",
 			"max_length",
@@ -439,6 +458,8 @@
 		"regex": true,
 		"replace_history":
 		[
+			", \\r",
+			", \\n",
 			"my name was \\1",
 			"\\1 \\2\\n",
 			"\\1 \\2",
@@ -467,7 +488,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 25.0
+		"height": 34.0
 	},
 	"input":
 	{
@@ -507,7 +528,7 @@
 	"project": "BeatNik.sublime-project",
 	"replace":
 	{
-		"height": 46.0
+		"height": 64.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -515,6 +536,38 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"sdu",
+				"bin/sqldump.py"
+			],
+			[
+				"clas",
+				"bin/Classes.py"
+			],
+			[
+				"par",
+				"bin/parser.py"
+			],
+			[
+				"parser.py",
+				"bin/parser.py"
+			],
+			[
+				"parser2",
+				"bin/parser2.py"
+			],
+			[
+				".gitig",
+				".gitignore"
+			],
+			[
+				"read",
+				"readme.txt"
+			],
+			[
+				"pars",
+				"bin/parser.py"
+			],
 			[
 				"bin",
 				"rosalind/bin.py"
@@ -841,6 +894,9 @@
 	"selected_group": 0,
 	"settings":
 	{
+		"_vintageous_last_char_search_command": "vi_t",
+		"_vintageous_last_character_search": "e",
+		"_vintageous_reset_during_init": true,
 		"vintage":
 		{
 		}
