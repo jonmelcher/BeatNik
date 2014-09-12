@@ -27,7 +27,6 @@ class Song(object):
         self.label    = None
         self.year     = None
         self.key      = None
-        self.playlist = []
 
 
     def refresh(self):
@@ -50,6 +49,18 @@ class Song(object):
         except Exception as e:
             raise IndexError('Index must be values 0-6.')
         return self.refresh()
+
+
+    def __eq__(self, other):
+        'Method for determining equality of songs.'
+        'Type: Song -> Song -> Bool'
+        if self.data[:2] == other.data[:2]:
+            return True
+        return False
+
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
     def __repr__(self):
@@ -234,6 +245,26 @@ class AudioKC(object):
     'AudioKC class holds the methods for accessing'
     'http://www.audiokeychain.com'
 
+    crawl_genres = [
+        'pop'   , 'rock'   , 'hip+hop'   , 'house'        , 'r%26b'     ,
+        'dance' , 'rap'    , 'country'   , 'electronic'   , 'blues'     ,
+        'trance', 'dubstep', 'other'     , 'soul'         , 'gospel'    ,
+        'punk'  , 'reggae' , 'folk'      , 'techno'       , 'remix'     ,
+        'club'  , 'funk'   , 'soundtrack','electronica'   , 'jazz'      ,
+        'grime' , 'emo'    , 'electro'   , 'drum+and+bass', 'indie+rock',
+        'latin' , 'bachata','dancehall'  ,'electro+house' , 'dancehall' ,
+        'edm'   , 'trap'   , 'indie'     , 'christian+rap', 'reggaeton' ,
+        'singer-songwriter', 'christian' , 'disco'        , 'new+age'   ,
+        'progressive+house', 'eurodance' , 'alternative'  , 'classical' ,
+        'rap/hip-hop'      , 'synthpop'  , 'indie+pop'    , 'boy+band'  ,
+        'worship+music'    , 'comedy'    , 'post-hardcore', 'crunk'     ,
+        'alternative+rock' ,  'metal'    , 'hip+hop/rap'  , 'hardstyle' ,
+        'swedish+house'    , 'industrial', 'heavy+metal'  , 'kulemina'  ,
+        'electropop'       , 'big+beat'  , 'electropop'   , 'ambient'   ,
+        'soca', 'kpop'     , 'anime'     , 'lmp'          , 'minimal'   ,
+        'pony'
+                    ]
+
     @staticmethod
     def url_helper(genre, page_number):
         'Helper function for crawl'
@@ -261,7 +292,7 @@ class AudioKC(object):
     def page_parse(url):
         'Parses raw_table_grab(url) and returns list of Song objects'
         'Type: String -> [Song]'
-        text = AudioKC.raw_table_grab(url)
+        text  = AudioKC.raw_table_grab(url)
         songs = []
         for raw_song_data in text:
             concatenated_song = ''.join(raw_song_data)
@@ -270,29 +301,38 @@ class AudioKC(object):
             #song_data is in the form [title, artist, key, bpm] so must
             #convert to a valid form for Song class.
             formatted_song_data = [song_data[1], song_data[0], 'NULL',
-                                   song_data[3],    'Null'   , 'Null',
-                                      'Null'   , song_data[2]]
+                                   song_data[3], 'Null'      , 'Null',
+                                   'Null'      , song_data[2]]
             songs.append(Song(formatted_song_data))
+
         return songs
 
     @staticmethod
-    def crawl(genres = ['metal']):
+    def crawl(genres = AudioKC.crawl_genres[0:2]):
         'Scrapes all song data from http://audiokeychain.com within'
-        'specified genres. Type: [String] -> Int -> [Song].'
-        songs = [[]]
+        'specified genres. Type: [String] -> [Song].'
+
+        """
+        Select slice of crawl_genres (must be list) to crawl that portion
+        of the genres on the website.
+        """
+        songs = set([])
 
         for genre in genres:
+            print 'Beginning to scrape genre %s.' % (genre)
             page_number = 1
             songs_size  = len(songs)
-            #Unions songs with [Song] result from parsing first page.
-            songs.union(AudioKC.page_parse(AudioKC.url_helper(genre,
-                                                      page_number)))
+            #Updates songs with [Song] result from parsing first page.
+            first_page  = AudioKC.page_parse(AudioKC.url_helper(genre,
+                                                         page_number))
+            songs.update(first_page)
 
             while len(songs) != songs_size:
-                songs_size = len(songs)
+                print "Scraped page %s for genre %s" % (page_number, genre)
+                songs_size   = len(songs)
                 page_number += 1
-                next_page = AudioKC.page_parse(AudioKC.url_helper(genre,
-                                                           page_number))
-                songs.union(next_page)
-                print page_number
-        return songs
+                next_page    = AudioKC.page_parse(AudioKC.url_helper(genre,
+                                                              page_number))
+                songs.update(next_page)
+
+        return list(songs)
