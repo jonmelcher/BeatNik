@@ -1,5 +1,5 @@
 """
-This file contains the crawlers for the BeatNik project, as well as the
+This file contains the scrapers for the BeatNik project, as well as the
 Song class.
 
 Newest Changes:
