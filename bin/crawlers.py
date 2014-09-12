@@ -48,7 +48,7 @@ class Song(object):
         try:
             self.data[index] = new_value
         except Exception as e:
-            raise IndexError('Index must be values 0-6.')
+            raise IndexError('Index must be values 0-%s' % len(self.data))
         return self.refresh()
 
 
@@ -100,17 +100,15 @@ class BPMDB(object):
         """
         Updates url for next parse in band_grab and letter_grab.
         """
-
         rooturl = "http://www.bpmdatabase.com/browse.php?begin="
         query   = "&artist=" if gate else "&letter="
-        url     = rooturl
-        url    += ("%s%s%s" % (begin, query, ending))
+        url     = rooturl + ("%s%s%s" % (begin, query, ending))
 
         return url
 
     @staticmethod
     def raw_table_grab(url):
-        'Helper function for Alpha/song_parse'
+        'Helper function for artist/song_parse'
         'Type: String -> String'
 
         """
@@ -315,7 +313,7 @@ class AudioKC(object):
         Select slice of crawl_genres (must be list) to crawl that portion
         of the genres on the website.
         """
-        crawl_genres = [
+        crawl_genres = [#length of crawl_genres is 74
         'pop'   , 'rock'   , 'hip+hop'   , 'house'        , 'r%26b'     ,
         'dance' , 'rap'    , 'country'   , 'electronic'   , 'blues'     ,
         'trance', 'dubstep', 'other'     , 'soul'         , 'gospel'    ,
