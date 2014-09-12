@@ -52,6 +52,24 @@ class Song(object):
         return self.refresh()
 
 
+    def __add__(self, other):
+        'Method for merging songs together. data[i] must be identical'
+        'or one \'Null\' to merge.'
+        'Type: Song -> Song -> Song'
+        merged_song_data = []
+        for i, element in enumerate(self.data):
+            if element == other.data[i]:
+                merged_song_data.append(element)
+            elif element == 'Null':
+                merged_song_data.append(other.data[i])
+            elif other.data[i] == 'Null':
+                merged_song_data.append(element)
+            else:
+                raise ValueError('.data must match other than Null values.')
+
+        return Song(merged_song_data)
+
+
     def __eq__(self, other):
         'Method for determining equality of songs.'
         'Type: Song -> Song -> Bool'
