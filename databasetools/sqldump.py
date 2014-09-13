@@ -8,7 +8,12 @@ import sqlite3
 # how to import modules from directories other than the current working
 # directory. Hence, this code is
 '''UNSTABLE'''
-from ..bin import Classes
+import scraper.Classes
+# from ..BeatNik.bin import Classes
+# from ..bin import Classes
+
+# from package.subpackage.module import method as name
+
 
 
 class song_db(object):
@@ -89,4 +94,3 @@ if __name__ == '__main__':
     db.insert_song(my_song, table_name)
 
     db.fetch_artist(my_song.artist, table_name)
-
