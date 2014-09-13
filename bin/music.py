@@ -45,7 +45,7 @@ class Song(object):
         return self.refresh()
 
 
-    def merge(self, other):
+    def __add__(self, other):
         'Method for merging songs together. data[i] must be identical'
         'or one \'Null\' to merge.'
         'Type: Song -> Song -> Song'
@@ -80,8 +80,8 @@ class Song(object):
     def __str__(self):
         rep_0 = "This is %s by %s, played at %s in the key of %s.\n" % (
                             self.title, self.artist, self.BPM, self.key)
-        rep_1 = "It is from the album %s, produced by %s in %s." % (
-                                  self.album, self.label, self.year)
+        rep_1 = "It is from the album %s, produced by %s in %s."     % (
+                                      self.album, self.label, self.year)
         return rep_0 + rep_1
 
 
