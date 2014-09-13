@@ -112,6 +112,7 @@ class BPMDB(object):
 
             logfile.write(time.strftime(
                 "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
+
             logfile.write(
                 "Search http://www.BPMdatabase.com for %s\n" % bandname)
 
@@ -144,7 +145,6 @@ class BPMDB(object):
         url          = BPMDB.url_helper(begin, False, value)
 
         scraped_data = BPMDB.artist_parse(url)
-
         while scraped_data:
             artists     += scraped_data
             begin       += 25
@@ -163,19 +163,23 @@ class BPMDB(object):
         Warning: changing alphanumeric value will change breadth
         of scrape.
         """
-        artists      = None
-        songs        = None
+        artists = None
+        songs   = None
 
         for letter in alphanumeric:
             print letter
             if not artists:
-                artists = BPMDB.letter_grab(letter)
+                artists  = BPMDB.letter_grab(letter)
             else:
                 artists += BPMDB.letter_grab(letter)
 
-        print artists
-        print 'Finding songs...'
+        print "Now finding songs by %s" % (artists)
+        print "Working..."
         return BPMDB.band_multi_grab(artists)
+
+
+    def __repr__(self):
+        return 'Scraper Class for http://www.BPMdatabase.com.'
 
 
 
@@ -260,17 +264,15 @@ class AudioKC(object):
         for genre in genres:
             print 'Beginning to scrape genre %s.' % (genre)
             #Initializes songs with [Song] result from parsing first page.
-            previous_size = len(songs)
-            previous_page = None
-            page_number   = 1
-            next_page     = AudioKC.page_parse(AudioKC.url_helper(genre,
-                                                           page_number))
-            songs        += next_page
+            previous_size, previous_page, page_number = len(songs), None, 1
+            next_page = AudioKC.page_parse(AudioKC.url_helper(genre,
+                                                        page_number))
+            songs     += next_page
 
             while next_page  != previous_page:
                 print "Scraped page %s for %s genre." % (page_number, genre)
                 songs_size    = len(songs)
-                print "Scraped a total of %s songs." % (songs_size)
+                print  "Scraped a total of %s songs." % (songs_size)
                 page_number  += 1
                 previous_page = next_page
                 next_page     = AudioKC.page_parse(AudioKC.url_helper(genre,
@@ -281,6 +283,7 @@ class AudioKC(object):
 
             logfile.write(time.strftime(
                 "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
+
             logfile.write(
                 "Searched http://www.audiokeychain.com for the following:\n")
 
@@ -288,3 +291,7 @@ class AudioKC(object):
                 logfile.write('\n' + ', '.join(song.data))
 
         return songs
+
+
+    def __repr__(self):
+        return 'Scraper Class for http://www.audiokeychain.com.'
