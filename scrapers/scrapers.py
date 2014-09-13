@@ -20,18 +20,19 @@ class BPMDB(object):
     'http://www.BPMdatabase.com.'
 
     @staticmethod
-    def url_helper(begin, gate, ending):
+    def url_helper(begin, is_artist, ending):
         'Helper function for band_grab and letter_grab'
         'Type: Int -> Bool -> String -> String'
 
         """
         Updates url for next parse in band_grab and letter_grab.
         """
-        rooturl = "http://www.bpmdatabase.com/browse.php?begin="
-        query   = "&artist=" if gate else "&letter="
-        url     = rooturl + ("%s%s%s" % (begin, query, ending))
+        rooturl       = "http://www.bpmdatabase.com/browse.php?begin="
+        artist_option = "&artist=" if is_artist else "&letter="
+        new_url       = rooturl + ("%s%s%s" %
+                        (begin, is_artist, ending))
 
-        return url
+        return new_url
 
     @staticmethod
     def raw_table_grab(url):
@@ -59,11 +60,7 @@ class BPMDB(object):
         'Type: String -> [String]'
 
         text = BPMDB.raw_table_grab(url)
-
-        if not text:
-            return None
-
-        data = re.findall('artist=(.+?)"', text)
+        data = re.findall('artist=(.+?)"', text) if text else None
 
         return data
 
@@ -73,21 +70,18 @@ class BPMDB(object):
         'Type: String -> [[String]]'
         'Each entry corresponds to Song initialization data.'
         'Refer to Song class for more information.'
-
         text = BPMDB.raw_table_grab(url)
 
         if not text or 'No records found.' in text:
             return None
-
         # Splits up the search results table by row.
-        temp_data = re.split('<tr class="line[12]">', text)
-        if '' in temp_data:
-            temp_data.remove('')
-
+        split_text = re.split('<tr class="line[12]">', text)
+        if '' in split_text:
+            split_text.remove('')
         # Collects the column entries from each row.
         # Replaces empty column entries with 'NULL'.
         data = []
-        for d in temp_data:
+        for splt in split_text:
             filled   = re.sub("<td></td>", "<td>NULL</td>", d)
             new_data = re.findall("<td>(.*?)</td>", filled)
 
@@ -95,6 +89,7 @@ class BPMDB(object):
                 data.append(new_data)
 
         return data
+
 
     @staticmethod
     def band_grab(bandname):
@@ -108,7 +103,7 @@ class BPMDB(object):
         scraped_data = BPMDB.song_parse(url)
 
         while scraped_data:
-            songs       += [music.Song(x) for x in scraped_data]
+            songs       += [music.Song(x) for song in scraped_data]
             begin       += 10
             url          = BPMDB.url_helper(begin, True, bandname)
             scraped_data = BPMDB.song_parse(url)
@@ -159,16 +154,15 @@ class BPMDB(object):
         return artists
 
     @staticmethod
-    def crawl():
-        'Uses above methods to crawl http://www.BPMdatabase.com.'
+    def scrape(alphanumeric = '3'):
+        'Uses above methods to scrape http://www.BPMdatabase.com.'
         'Type: Void -> [Song]'
 
         """
         Note that scrapelog.txt will list all song information.
-        Warning: this will crawl the entire website and may take
-        time and resources.
+        Warning: changing alphanumeric value will change breadth
+        of scrape.
         """
-        alphanumeric = '3'   #This is where 0-9A-Z goes
         artists      = None
         songs        = None
 
@@ -191,11 +185,11 @@ class AudioKC(object):
 
     @staticmethod
     def url_helper(genre, page_number):
-        'Helper function for crawl'
+        'Helper function for scrape.'
         rooturl = "http://www.audiokeychain.com/database?genre[]="
         url     = rooturl + "%s&page=%s" % (genre, page_number)
-        return url
 
+        return url
 
     @staticmethod
     def raw_table_grab(url):
@@ -210,6 +204,7 @@ class AudioKC(object):
         for line in page:
             if '<span class="title"' in line:
                 text.append([line] + [page.next() for i in range(3)])
+
         return text[1:]
 
     @staticmethod
@@ -219,9 +214,9 @@ class AudioKC(object):
         text  = AudioKC.raw_table_grab(url)
         songs = []
         for raw_song_data in text:
-            concatenated_song = ''.join(raw_song_data)
+            concatted_song = ''.join(raw_song_data)
             song_data = re.findall('<span class="[takb][^"]*?">(.*?)<',
-                                                     concatenated_song)
+                                                        concatted_song)
             #song_data is in the form [title, artist, key, bpm] so must
             #convert to a valid form for Song class.
             formatted_song_data = [song_data[1], song_data[0], 'NULL',
@@ -232,15 +227,15 @@ class AudioKC(object):
         return songs
 
     @staticmethod
-    def crawl(lower, upper):
+    def scrape(lower, upper):
         'Scrapes all song data from http://audiokeychain.com within'
         'specified genres. Type: Int -> Int -> [Song].'
 
         """
-        Select slice of crawl_genres (must be list) to crawl that portion
+        Select slice of scrape_genres (must be list) to scrape that portion
         of the genres on the website.
         """
-        crawl_genres = [#length of crawl_genres is 74
+        scrape_genres = [#length of scrape_genres is 74
         'pop'   , 'rock'   , 'hip+hop'   , 'house'        , 'r%26b'     ,
         'dance' , 'rap'    , 'country'   , 'electronic'   , 'blues'     ,
         'trance', 'dubstep', 'other'     , 'soul'         , 'gospel'    ,
@@ -258,9 +253,9 @@ class AudioKC(object):
         'electropop'       , 'big+beat'  , 'electropop'   , 'ambient'   ,
         'soca', 'kpop'     , 'anime'     , 'lmp'          , 'minimal'   ,
         'pony'
-                    ]
+                        ]
 
-        genres = crawl_genres[lower:upper]
+        genres = scrape_genres[lower:upper]
         songs  = []
         for genre in genres:
             print 'Beginning to scrape genre %s.' % (genre)
