@@ -18,6 +18,11 @@ class Song(object):
     def refresh(self, data):
         'Method for assigning and renewing data. Allows data editing to'
         'be done solely with self.data.'
+
+        """
+        Song.data order will be:
+        [artist, title, album, BPM, genre, label, year, key]
+        """
         self.data = data
         self.artist = self.data[0]
         self.title  = self.data[1]
