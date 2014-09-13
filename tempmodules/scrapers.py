@@ -30,7 +30,7 @@ class BPMDB(object):
         rooturl       = "http://www.bpmdatabase.com/browse.php?begin="
         artist_option = "&artist=" if is_artist else "&letter="
         new_url       = rooturl + ("%s%s%s" %
-                        (begin, is_artist, ending))
+                        (begin, artist_option, ending))
 
         return new_url
 
@@ -82,7 +82,7 @@ class BPMDB(object):
         # Replaces empty column entries with 'NULL'.
         data = []
         for splt in split_text:
-            filled   = re.sub("<td></td>", "<td>NULL</td>", d)
+            filled   = re.sub("<td></td>", "<td>NULL</td>", splt)
             new_data = re.findall("<td>(.*?)</td>", filled)
 
             if len(new_data) == 7:
@@ -103,7 +103,7 @@ class BPMDB(object):
         scraped_data = BPMDB.song_parse(url)
 
         while scraped_data:
-            songs       += [music.Song(x) for song in scraped_data]
+            songs       += [music.Song(song) for song in scraped_data]
             begin       += 10
             url          = BPMDB.url_helper(begin, True, bandname)
             scraped_data = BPMDB.song_parse(url)
