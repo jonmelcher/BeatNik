@@ -13,19 +13,12 @@ class Song(object):
     def __init__(self, song_data):
 
         self.data     = song_data
-        self.artist   = None
-        self.title    = None
-        self.album    = None
-        self.BPM      = None
-        self.genre    = None
-        self.label    = None
-        self.year     = None
-        self.key      = None
+        self.refresh(song_data)
 
-
-    def refresh(self):
+    def refresh(self, data):
         'Method for assigning and renewing data. Allows data editing to'
         'be done solely with self.data.'
+        self.data = data
         self.artist = self.data[0]
         self.title  = self.data[1]
         self.album  = self.data[2]
