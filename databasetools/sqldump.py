@@ -8,7 +8,7 @@ import sqlite3
 # how to import modules from directories other than the current working
 # directory. Hence, this code is
 '''UNSTABLE'''
-from Classes import Song
+from ..bin import Classes
 
 
 class song_db(object):
@@ -23,7 +23,6 @@ class song_db(object):
         self.cursor = None
         self.conn = None
         self.connect()
-
 
     def connect(self):
         'Connects the database to the self.database database.'
@@ -45,7 +44,6 @@ class song_db(object):
 
     def insert_song(self, song, table):
 
-
         self.cursor.execute('''INSERT INTO %s VALUES
             ('%s', '%s', '%s', '%s', '%s', '%s', '%s')'''
             % (table,
@@ -58,6 +56,7 @@ class song_db(object):
                song.year,
               )
             )
+
     def delete_song(self, song):
         print "No."
 
