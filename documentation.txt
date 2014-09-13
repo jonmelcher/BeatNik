@@ -1,0 +1,130 @@
+################################################################
+#                Documentation File for BeatNik                #
+#                                                              #
+#  BeatNik: a Python music data project                        #
+#                                                              #
+#  Collaborators:     Andrew Stewart                           #
+#                   Jonathan Melcher                           #
+#                                                              #
+#  Documentation last updated on 09/12/14                      #
+################################################################
+
+#########   This project is intended to serve to help both the
+# GOALS #   collaborators in improve at coding in general as
+#########   well as coding cooperatively, and to help develop
+the skills necessary to organize, develop, and to publish a
+finished product.  We are both new to programming and any and
+all comments on the code should please be directed to on of our
+e-mails, we would be happy to read it!
+
+#########   In this section we will list all classes/methods
+# FILES #   available within each file, as well as the file
+#########   dependencies.
+
+music.py    - Playlist Class
+            - Song     Class
+            - ...
+
+scraper.py  - This file uses music.py as a module.
+            - BPMDB    Class
+            - AudioKC  Class
+
+...
+
+##############  In this section we will describe the class, and
+# SCRAPER.PY #  expand on the methods for the classes found in
+##############  scraper.py.
+
+class BPMDB()   - This class has is not instantiated; all methods
+                  within are static.  In this respect its class
+                  serves only to keep the methods together.  The
+                  methods are as follows:
+
+url_helper(begin, gate, ending)
+-   This is a helper function used later in the functions band_grab
+    and letter_grab.  Its purpose is to shift some of the numerical
+    values found in urls (begin=x, num=y, etc.) and return the new
+    url.  With respect to the functions it helps, it updates the url
+    they are using for the next single-page parse call.
+
+    Type:   Int -> Bool -> String -> String
+
+    Example:
+    BPMDB.url_helper(10, True, 'Radiohead') returns
+    "http://www.bpmdatabase.com/browse.php?begin=10&artist=Radiohead"
+
+raw_table_grab(url)
+-   This is a helper function used later in the functions artist_parse
+    and song_parse.  Its purpose is to take the HTML source from the
+    url argument and find the line containing the pertinent information,
+    and return it as a string.  With respect to the functions it helps,
+    it does most of the grunt work, allowing the latter functions to
+    pattern match more accurately and easily.
+
+    Type:   String -> String
+
+    Example:
+    BPMDB.raw_table_grab('http://www.bpmdatabase.com/browse.php?begin=0&num=1&artist=Radiohead')
+    returns "...<td>Radiohead</td><td>Fake Plastic Trees</td><td></td><td>74 BPM</td><td></td><td>Capitol Records</td>..."
+
+artist_parse(url)
+-   This is a main method which uses raw_table_grab on url, and regex
+    pattern matching to return a list of artists.
+
+    Type:   String -> [String]
+
+    Example:
+    BPMDB.artist_parse('http://www.bpmdatabase.com/browse.php?letter=3')
+    returns ['3+Days+Grace', '3+Doors+Down', '3+Jays', '3+Phase+Featuring+Dr.+Motte', '3-Day+Threshold', '311', '3OH%213']
+
+song_parse(url)
+-   This is a main method which uses raw_table_grab on url, and regex
+    pattern matching to return a list of lists of song data.
+
+    Type:   String -> [[String]]
+
+    Example:
+    BPMDB.song_parse('http://www.bpmdatabase.com/browse.php?artist=3+Days+Grace')
+    returns [['3 Days Grace', 'Home', 'NULL', '84 BPM', 'NULL', 'NULL', 'NULL'], ['3 Days Grace', 'Everything About You', 'NULL', '89 BPM', 'NULL', 'NULL', 'NULL'], ['3 Days Grace', 'Animal I Have Become', 'NULL', '120 BPM', 'NULL', 'NULL', '2006']]
+
+band_grab(bandname)
+-   This is a main method which scrapes all songs by the bandname on the website.
+    It uses both url_helper and song_parse.  band_grab also contains the method
+    to write to the scrapelog.text file.  band_grab calls song_parse as many times
+    as necessary, and then uses the data to initialize and return a list of Song
+    objects.
+
+    Type:   String -> [Song]
+
+    Example:
+    See song_parse and Song Class for more information.
+    band_grab('Radiohead') = [ Song([Corresponding list from song_parse]) ]
+
+band_multi_grab(bandlist)
+-   This is a main method which takes a list of bandnames and calls and combines results
+    from band_grab.
+
+    Type:   [String] -> [Song]
+
+    Example:
+    See band_grab for more information.
+
+letter_grab(value)
+-   This is a main function which will scrape all artist names which start with
+    the given value.  It uses url_helper as well as artist_parse to do this.
+
+    Type:   Char -> [String]
+
+    Example:
+    BPMDB.letter_grab('3') returns
+    ['3+Days+Grace', '3+Doors+Down', '3+Jays', '3+Phase+Featuring+Dr.+Motte', '3-Day+Threshold', '311', '3OH%213']
+
+crawl()
+-   This is the method the class was designed for, it combines all other methods to scrape
+    every artist starting with characters found by iterating over alphanumeric variable, and
+    then scrapes all songs by said artists.  This writes all of the activity to scrapelog.txt
+    and returns a combined list of all the songs scraped.
+
+    Type:   Void -> [Song]
+
+TO BE CONTINUED
