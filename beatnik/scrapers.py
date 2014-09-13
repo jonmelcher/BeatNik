@@ -45,7 +45,7 @@ class BPMDB(object):
         """
         #Testing the regular expression pattern:
         if test:
-            return re.findall('<tr class="line2".*tr>', test)
+            return re.findall('<tr class="line2".*tr>', test)[0]
 
         page = urllib2.urlopen(url)
         text = ""
@@ -68,7 +68,7 @@ class BPMDB(object):
         return data
 
     @staticmethod
-    def song_parse(url = None, text = None):
+    def song_parse(url, text = None):
         'Parses all song data from text taken from a result page.'
         'Each entry corresponds to Song initialization data.'
         'It will have to be formatted correctly to go to output.'
@@ -284,7 +284,7 @@ class AudioKC(object):
             raise TypeError('lower and upper must provide a list slice as input')
         elif lower > upper:
             lower, upper = upper, lower
-        if lower < 0 || upper > 74:
+        if lower < 0 or upper > 74:
             raise IndexError('List slice must fall directly within 0:74.')
 
         genres = scrape_genres[lower:upper]
