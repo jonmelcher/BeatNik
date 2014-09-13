@@ -38,3 +38,6 @@ Icon
 # Database files
 databases/
 *.db
+
+# Scrape log
+scrapelog.txt
