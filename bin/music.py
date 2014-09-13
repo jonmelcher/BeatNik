@@ -41,38 +41,48 @@ class Song(object):
         try:
             self.data[index] = new_value
         except Exception as e:
-            raise IndexError('Index must be values 0-%s' % len(self.data))
+            raise IndexError('Index must be value 0-%s.' % len(self.data))
         return self.refresh()
 
 
-    def __add__(self, other):
+    def merge(self, other):
         'Method for merging songs together. data[i] must be identical'
         'or one \'Null\' to merge.'
         'Type: Song -> Song -> Song'
         merged_song_data = []
+
+        if self.__ne__(other):
+            raise Exception('Songs must have same attributes or be \'Null\'')
+
         for i, element in enumerate(self.data):
-            if element == other.data[i]:
-                merged_song_data.append(element)
-            elif element == 'Null':
-                merged_song_data.append(other.data[i])
-            elif other.data[i] == 'Null':
+            if element == 'Null':
                 merged_song_data.append(element)
             else:
-                raise ValueError('.data must match other than Null values.')
+                merged_song_data.append(other.data[i])
 
         return Song(merged_song_data)
 
-
+    #Comparison Methods
     def __eq__(self, other):
         'Method for determining equality of songs.'
         'Type: Song -> Song -> Bool'
-        if self.data[:2] == other.data[:2]:
-            return True
-        return False
+
+        for i, element in enumerate(self.data):
+            if element != other.data[i] and 'Null' not in [element, other.data[i]]:
+                return False
+        return True
 
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    #Representation Methods
+    def __str__(self):
+        rep_0 = "This is %s by %s, played at %s in the key of %s.\n" % (
+                            self.title, self.artist, self.BPM, self.key)
+        rep_1 = "It is from the album %s, produced by %s in %s." % (
+                                  self.album, self.label, self.year)
+        return rep_0 + rep_1
 
 
     def __repr__(self):
