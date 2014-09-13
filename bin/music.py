@@ -76,8 +76,15 @@ class Song(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    #Representation Methods
-    def __str__(self):
+
+    def __nonzero__(self):  #Runs when bool(Song) is called eg. if Song():
+        for element in self.data:
+            if element != 'Null':
+                return True
+        return False
+
+
+    def __str__(self):  #Runs when str(Song) is called eg. print Song(x).
         rep_0 = "This is %s by %s, played at %s in the key of %s.\n" % (
                             self.title, self.artist, self.BPM, self.key)
         rep_1 = "It is from the album %s, produced by %s in %s."     % (
