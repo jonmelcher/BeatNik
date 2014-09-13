@@ -8,7 +8,7 @@ import sqlite3
 # how to import modules from directories other than the current working
 # directory. Hence, this code is
 '''UNSTABLE'''
-import bin.Classes
+import bin.scrapers
 # from ..BeatNik.bin import Classes
 # from ..bin import Classes
 
@@ -38,7 +38,7 @@ class song_db(object):
         'Attempts to create an SQL table.'
         try:
             self.cursor.execute('''CREATE TABLE %s
-                (artist text, title text, album text, label text, year int, genre text, BPM real)''' % name)
+                (artist text, title text, album text, label text, year int, genre text, BPM real, key text)''' % name)
         except sqlite3.OperationalError:
             print 'The table %s already exists' % name
 
@@ -50,7 +50,7 @@ class song_db(object):
     def insert_song(self, song, table):
 
         self.cursor.execute('''INSERT INTO %s VALUES
-            ('%s', '%s', '%s', '%s', '%s', '%s', '%s')'''
+            ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')'''
             % (table,
                song.artist,
                song.title,
@@ -59,6 +59,7 @@ class song_db(object):
                song.genre,
                song.label,
                song.year,
+               song.key,
               )
             )
 
@@ -81,16 +82,4 @@ class song_db(object):
 
 
 if __name__ == '__main__':
-    db = song_db('BPMdatabase', 'bpmdatabase.db')
-    table_name = 'my_songs'
-    db.drop_table(table_name)
-    db.create_table(table_name)
-
-    my_song_data = ['Radiohead', 'Time of my life', 'The Very Best of Neil Young', 9001, 'Electronic', 'Spam Recording Inc', 2015]
-
-    my_song = Song(my_song_data)
-
-
-    db.insert_song(my_song, table_name)
-
-    db.fetch_artist(my_song.artist, table_name)
+    pass
