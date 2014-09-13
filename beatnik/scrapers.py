@@ -21,11 +21,11 @@ class BPMDB(object):
 
     @staticmethod
     def url_helper(begin, is_artist, ending):
-        'Helper function for band_grab and letter_grab'
+        'Helper function for artist_grab and letter_grab'
         'Type: Int -> Bool -> String -> String'
 
         """
-        Updates url for next parse in band_grab and letter_grab.
+        Updates url for next parse in artist_grab and letter_grab.
         """
         rooturl       = "http://www.bpmdatabase.com/browse.php?begin="
         artist_option = "&artist=" if is_artist else "&letter="
@@ -35,7 +35,7 @@ class BPMDB(object):
         return new_url
 
     @staticmethod
-    def raw_table_grab(url):
+    def raw_table_grab(url, test = ""):
         'Helper function for artist/song_parse'
         'Type: String -> String'
 
@@ -43,9 +43,12 @@ class BPMDB(object):
         Accesses search results page from http://www.BPMdatabase.com
         And scrapes out raw table data from HTML source.
         """
+        #Testing the regular expression pattern:
+        if test:
+            return re.findall('<tr class="line2".*tr>', test)
+
         page = urllib2.urlopen(url)
         text = ""
-
         # Finds the line containing the table of search results.
         for line in page:
             if re.findall('<tr class="line2".*tr>', line):
@@ -65,79 +68,77 @@ class BPMDB(object):
         return data
 
     @staticmethod
-    def song_parse(url):
-        'Parses all song data from a result page.'
-        'Type: String -> [[String]]'
+    def song_parse(url = None, text = None):
+        'Parses all song data from text taken from a result page.'
         'Each entry corresponds to Song initialization data.'
-        'Refer to Song class for more information.'
-        text = BPMDB.raw_table_grab(url)
+        'It will have to be formatted correctly to go to output.'
+        'The required format for Song class is:'
+        '[artist, title, album, BPM, genre, label, year, key]'
+        'Type: String -> [[String]]'
 
+        # Conditional to allow testing.
+        if url:
+            text = BPMDB.raw_table_grab(url)
+        # Conditional for negative result.
         if not text or 'No records found.' in text:
             return None
         # Splits up the search results table by row.
         split_text = re.split('<tr class="line[12]">', text)
-        if '' in split_text:
-            split_text.remove('')
         # Collects the column entries from each row.
         # Replaces empty column entries with 'NULL'.
         data = []
         for splt in split_text:
-            filled   = re.sub("<td></td>", "<td>NULL</td>", splt)
-            new_data = re.findall("<td>(.*?)</td>", filled)
-
-            if len(new_data) == 7:
-                data.append(new_data)
+            song_data = re.findall("<td>(.*?)</td>", splt)
+            if len(song_data) == 7:
+                #song_data is in form
+                #[artist, title, album, BPM, genre, label, year].
+                #current formatting to match Song format:
+                song_data.append("")
+                data.append(song_data)
 
         return data
 
-
     @staticmethod
-    def band_grab(bandname):
-        'Grabs and parses all songs by the band in question'
+    def artist_grab(artist):
+        'Grabs and parses all songs by the artist in question'
+        'Relies on url_helper and song_parser to work'
+        'In this function the bool in url_helper is set to True'
+        'As we are searching for artists.'
         'Type: String -> [Song]'
 
-        bandname     = bandname.rstrip().replace(' ','+')
+        artist       = artist.rstrip().replace(' ','+')
         songs        = []
         begin        = 0
-        url          = BPMDB.url_helper(begin, True, bandname)
+        url          = BPMDB.url_helper(begin, True, artist)
         scraped_data = BPMDB.song_parse(url)
 
         while scraped_data:
             songs       += [music.Song(song) for song in scraped_data]
             begin       += 10
-            url          = BPMDB.url_helper(begin, True, bandname)
-            scraped_data = BPMDB.song_parse(url)
-
-        with open("scrapelog.txt", "a") as logfile:
-
-            logfile.write(time.strftime(
-                "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
-
-            logfile.write(
-                "Search http://www.BPMdatabase.com for %s\n" % bandname)
-
-            for song in songs:
-                logfile.write('\n' + ', '.join(song.data))
+            next_url     = BPMDB.url_helper(begin, True, artist)
+            scraped_data = BPMDB.song_parse(next_url)
 
         return songs
 
     @staticmethod
-    def band_multi_grab(bandlist):
-        'List version of band_grab'
+    def artist_multi_grab(artists):
+        'List version of artist_grab'
         'Type: [String] -> [Song]'
 
         songs = None
-        for band in bandlist:
+        for artist in artists:
             if not songs:
-                songs  = BPMDB.band_grab(band)
+                songs  = BPMDB.artist_grab(artist)
             else:
-                songs += BPMDB.band_grab(band)
+                songs += BPMDB.artist_grab(artist)
 
         return songs
 
     @staticmethod
     def letter_grab(value):
         'Grabs and parses all artists starting with \'value\'.'
+        'In this function the bool in url_helper is set to False'
+        'As we are searching for a letter.'
         'Type: String -> [String]'
 
         artists      = []
@@ -148,13 +149,13 @@ class BPMDB(object):
         while scraped_data:
             artists     += scraped_data
             begin       += 25
-            url          = BPMDB.url_helper(begin, False, value)
-            scraped_data = BPMDB.artist_parse(url)
+            next_url     = BPMDB.url_helper(begin, False, value)
+            scraped_data = BPMDB.artist_parse(next_url)
 
         return artists
 
     @staticmethod
-    def scrape(alphanumeric = '3'):
+    def scrape(alphanumeric = '3', write_to_text = False):
         'Uses above methods to scrape http://www.BPMdatabase.com.'
         'Type: Void -> [Song]'
 
@@ -164,7 +165,6 @@ class BPMDB(object):
         of scrape.
         """
         artists = None
-        songs   = None
 
         for letter in alphanumeric:
             print letter
@@ -175,7 +175,20 @@ class BPMDB(object):
 
         print "Now finding songs by %s" % (artists)
         print "Working..."
-        return BPMDB.band_multi_grab(artists)
+
+        songs = BPMDB.artist_multi_grab(artists)
+        # Writing to text log.  This should be written as a function elsewhere.
+        if write_to_text:
+            with open("scrapelog.txt", "a") as logfile:
+
+                logfile.write(time.strftime(
+                    "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
+
+                logfile.write(
+                    "Searched http://www.BPMdatabase.com for the following:\n")
+
+                for song in songs:
+                    logfile.write('\n' + ', '.join(song.data))
 
 
     def __repr__(self):
@@ -190,20 +203,20 @@ class AudioKC(object):
     @staticmethod
     def url_helper(genre, page_number):
         'Helper function for scrape.'
+        'Returns updated url based on parameters.'
         rooturl = "http://www.audiokeychain.com/database?genre[]="
-        url     = rooturl + "%s&page=%s" % (genre, page_number)
+        new_url = rooturl + "%s&page=%s" % (genre, page_number)
 
-        return url
+        return new_url
 
     @staticmethod
     def raw_table_grab(url):
-        """
-        Accesses search results page from http://www.audiokeychain.com
-        And scrapes out pertinent raw table data from HTML source.
-        """
+        'Accesses search results page from http://www.audiokeychain.com'
+        'And scrapes out pertinent raw table data from HTML source.'
+        'This differs from BPMDBs function by taking blocks of full lines.'
+        'Type: String -> [[String]]'
         page = urllib2.urlopen(url)
         text = []
-
         # Finds the line containing the table of search results.
         for line in page:
             if '<span class="title"' in line:
@@ -212,10 +225,18 @@ class AudioKC(object):
         return text[1:]
 
     @staticmethod
-    def page_parse(url):
-        'Parses raw_table_grab(url) and returns list of Song objects'
+    def page_parse(url = None, text = None):
+        'Parses all song data from text taken from a result page.'
+        'Each entry corresponds to Song initialization data.'
+        'It will have to be formatted correctly to go to output.'
+        'The required format for Song class is:'
+        '[artist, title, album, BPM, genre, label, year, key]'
         'Type: String -> [Song]'
-        text  = AudioKC.raw_table_grab(url)
+        # Condition for testing
+        # For testing, set text = [[String]] type
+        if url:
+            text  = AudioKC.raw_table_grab(url)
+
         songs = []
         for raw_song_data in text:
             concatted_song = ''.join(raw_song_data)
@@ -231,15 +252,15 @@ class AudioKC(object):
         return songs
 
     @staticmethod
-    def scrape(lower, upper):
+    def scrape(lower, upper, write_to_text = False):
         'Scrapes all song data from http://audiokeychain.com within'
         'specified genres. Type: Int -> Int -> [Song].'
 
         """
         Select slice of scrape_genres (must be list) to scrape that portion
-        of the genres on the website.
+        of the genres on the website.  Length of scrape_genres = 74.
         """
-        scrape_genres = [#length of scrape_genres is 74
+        scrape_genres = [  # length of scrape_genres is 74
         'pop'   , 'rock'   , 'hip+hop'   , 'house'        , 'r%26b'     ,
         'dance' , 'rap'    , 'country'   , 'electronic'   , 'blues'     ,
         'trance', 'dubstep', 'other'     , 'soul'         , 'gospel'    ,
@@ -258,37 +279,45 @@ class AudioKC(object):
         'soca', 'kpop'     , 'anime'     , 'lmp'          , 'minimal'   ,
         'pony'
                         ]
+        #Handling exceptions
+        if lower == upper:
+            raise TypeError('lower and upper must provide a list slice as input')
+        elif lower > upper:
+            lower, upper = upper, lower
+        if lower < 0 || upper > 74:
+            raise IndexError('List slice must fall directly within 0:74.')
 
         genres = scrape_genres[lower:upper]
         songs  = []
         for genre in genres:
-            print 'Beginning to scrape genre %s.' % (genre)
-            #Initializes songs with [Song] result from parsing first page.
+            print 'Beginning to scrape for the genre %s.' % (genre)
+            #Initializes songs with [Song] output from parsing first page.
             previous_size, previous_page, page_number = len(songs), None, 1
             next_page = AudioKC.page_parse(AudioKC.url_helper(genre,
                                                         page_number))
             songs     += next_page
 
             while next_page  != previous_page:
-                print "Scraped page %s for %s genre." % (page_number, genre)
                 songs_size    = len(songs)
-                print  "Scraped a total of %s songs." % (songs_size)
+                print "Scraped page %s for the genre %s." % (page_number, genre)
+                print "Scraped a grand total of %s songs." % (songs_size)
                 page_number  += 1
                 previous_page = next_page
                 next_page     = AudioKC.page_parse(AudioKC.url_helper(genre,
                                                                page_number))
                 songs += next_page
+        # Writing to text log.  This should be written as a function elsewhere.
+        if write_to_text:
+            with open("scrapelog.txt", "a") as logfile:
 
-        with open("scrapelog.txt", "a") as logfile:
+                logfile.write(time.strftime(
+                    "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
 
-            logfile.write(time.strftime(
-                "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
+                logfile.write(
+                    "Searched http://www.audiokeychain.com for the following:\n")
 
-            logfile.write(
-                "Searched http://www.audiokeychain.com for the following:\n")
-
-            for song in songs:
-                logfile.write('\n' + ', '.join(song.data))
+                for song in songs:
+                    logfile.write('\n' + ', '.join(song.data))
 
         return songs
 
