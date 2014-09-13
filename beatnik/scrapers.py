@@ -74,19 +74,28 @@ class BPMDB(object):
 
         if not text or 'No records found.' in text:
             return None
+
         # Splits up the search results table by row.
-        split_text = re.split('<tr class="line[12]">', text)
-        if '' in split_text:
-            split_text.remove('')
+        temp_data = re.split('<tr class="line[12]">', text)
+        if '' in temp_data:
+            temp_data.remove('')
         # Collects the column entries from each row.
         # Replaces empty column entries with 'NULL'.
         data = []
-        for splt in split_text:
-            filled   = re.sub("<td></td>", "<td>NULL</td>", splt)
-            new_data = re.findall("<td>(.*?)</td>", filled)
+        for d in temp_data:
+            song_data = re.findall("<td>(.*?)</td>", d)
 
-            if len(new_data) == 7:
-                data.append(new_data)
+            # song_data contains information in the order:
+            # [artist, title, album, BPM, genre, label, year]
+            #
+            # Song objects are initialized with lists in the order:
+            # [artist, title, album, BPM, genre, label, year, key]
+            #
+            # So, we don't need to re-arrange song_data;
+            # we simply have to add an empty 'key' attribute
+
+            song_data.append('')
+            data.append(song_data)
 
         return data
 
@@ -108,16 +117,6 @@ class BPMDB(object):
             url          = BPMDB.url_helper(begin, True, bandname)
             scraped_data = BPMDB.song_parse(url)
 
-        with open("scrapelog.txt", "a") as logfile:
-
-            logfile.write(time.strftime(
-                "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
-
-            logfile.write(
-                "Search http://www.BPMdatabase.com for %s\n" % bandname)
-
-            for song in songs:
-                logfile.write('\n' + ', '.join(song.data))
 
         return songs
 
@@ -154,9 +153,10 @@ class BPMDB(object):
         return artists
 
     @staticmethod
-    def scrape(alphanumeric = '3'):
-        'Uses above methods to scrape http://www.BPMdatabase.com.'
-        'Type: Void -> [Song]'
+    def scrape(alphanumeric = '3', writetofile=False):
+        'Uses above methods to scrape http://www.BPMdatabase.com, '
+        'scraping all artists starting with a characer in alphanumeric.'
+        'Type: String -> [Song]'
 
         """
         Note that scrapelog.txt will list all song information.
@@ -173,10 +173,27 @@ class BPMDB(object):
             else:
                 artists += BPMDB.letter_grab(letter)
 
-        print "Now finding songs by %s" % (artists)
-        print "Working..."
-        return BPMDB.band_multi_grab(artists)
+        # print "Now finding songs by %s" % (artists)
 
+        songs = BPMDB.band_multi_grab(artists)
+        if writetofile:
+            for song in songs:
+                log_parse(song)
+
+        return songs
+
+    @staticmethod
+    def log_parse(song):
+        with open("scrapelog.txt", "a") as logfile:
+
+            logfile.write(time.strftime(
+                "\n\nNew log created at %H:%M:%S on %d/%m/%Y\n\n"))
+
+            logfile.write(
+                "Search http://www.BPMdatabase.com for %s\n" % bandname)
+
+            for song in songs:
+                logfile.write('\n' + ', '.join(song.data))
 
     def __repr__(self):
         return 'Scraper Class for http://www.BPMdatabase.com.'

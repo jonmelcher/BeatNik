@@ -1,19 +1,8 @@
 '''
-An example of how to add to a database.
+Some tools for interacting with an sqlite database.
 '''
 
 import sqlite3
-
-# I needed to copy Classes.py to the current direcory. I don't know
-# how to import modules from directories other than the current working
-# directory. Hence, this code is
-'''UNSTABLE'''
-import bin.scrapers
-# from ..BeatNik.bin import Classes
-# from ..bin import Classes
-
-# from package.subpackage.module import method as name
-
 
 
 class song_db(object):
@@ -22,9 +11,9 @@ class song_db(object):
     # Fix documentation
 
 
-    def __init__(self, name, db_name):
+    def __init__(self, name, database):
         self.name = name
-        self.database = db_name
+        self.database = database
         self.cursor = None
         self.conn = None
         self.connect()
@@ -34,7 +23,7 @@ class song_db(object):
         self.conn = sqlite3.connect(self.database)
         self.cursor = self.conn.cursor()
 
-    def create_table(self, name):
+    def create_song_table(self, name):
         'Attempts to create an SQL table.'
         try:
             self.cursor.execute('''CREATE TABLE %s
@@ -42,12 +31,16 @@ class song_db(object):
         except sqlite3.OperationalError:
             print 'The table %s already exists' % name
 
+
     def drop_table(self, name):
         'Drops name if it exists.'
+
         self.cursor.executescript('drop table if exists %s;' % name)
 
 
     def insert_song(self, song, table):
+        'Inserts song into table.'
+        'Refer to music.py for the Song class.'
 
         self.cursor.execute('''INSERT INTO %s VALUES
             ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')'''
@@ -67,11 +60,17 @@ class song_db(object):
         print "No."
 
     def fetch_artist(self, artist, table):
+        'Returns a list of all database entries in table'
+        'with the matching artist.'
+
         t = (artist, )
-        self.cursor.execute('SELECT * FROM my_songs WHERE artist=?', t)
-        return self.cursor.fetchone()
+        self.cursor.execute('SELECT * FROM %s WHERE artist=?' % table, t)
+        return self.cursor.fetchall()
 
 
+    def table_contents(self, table):
+        self.cursor.execute('SELECT * FROM %s' % table)
+        return self.cursor.fetchall()
 
 
     def commit(self):
