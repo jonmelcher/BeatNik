@@ -127,4 +127,64 @@ crawl()
 
     Type:   Void -> [Song]
 
-TO BE CONTINUED
+This concludes the methods of class BPMBD.
+
+
+class AudioKC()   - This class has is not instantiated; all methods
+                    within are static.  In this respect its class
+                    serves only to keep the methods together.  The
+                    methods are as follows:
+
+url_helper(genre, page_number):
+-   See BPMD.url_helper for more information, this works analogously.
+
+    Type:   String -> Int -> String
+
+    Example:
+    AudioKC.url_helper('rock,', 5) returns
+    "http://www.audiokeychain.com/database?genre[]=rock&page=5"
+
+raw_table_grab(url):
+-   See BPMD.raw_table_grab for more information, works analogously.
+    One change is that it must return a list of strings instead of a
+    string.
+
+    Type:   String -> [String]
+
+    Example:
+
+    Let url be the one seen in url_helper.  Then
+    AudioKC.raw_table_grab(url) returns the list
+    ...['<td><a class="noStyleLink" href="/track/oR/bon-jovi-livin-on-a-prayer">
+        <span class="title">Livin\' On A Prayer</span></a></td>\n', '<td><a cla
+        ss="noStyleLink" href="/track/oR/bon-jovi-livin-on-a-prayer"><span class
+        ="artist">Bon Jovi</span></a></td>\n', '<td><a class="noStyleLink" href=
+        "/track/oR/bon-jovi-livin-on-a-prayer"><span class="key">8B / C</span></
+        a></td>\n', '<td><a class="noStyleLink" href="/track/oR/bon-jovi-livin-o
+        n-a-prayer"><span class="bpm">123.00</span></a></td>\n']
+
+page_parse(url)
+-   See BPMD.song_parse and band_grab for more details, works analogously except
+    on a list of strings instead of a string.  Uses raw_table_grab and regex to
+    parse songs.
+
+    Type:   String -> [Song]
+
+crawl(lower, upper)
+-   See BPMD.crawl for more details.  Given a list of genres, function takes
+    slice values as variables input must end up being [String], and scrapes
+    http://www.audiokeychain.com genre search results for all songs, writes
+    to the same log in the same fashion as BPMD, and returns a list of Song
+    objects.  Uses all previous methods as BPMD.crawl does.
+
+    Type:   Int -> Int -> [Song]
+
+This concludes the AudioKC class.
+
+####################
+# ADDITIONAL NOTES #
+####################
+
+##################################
+# END OF SCRAPER CLASSES/METHODS #
+##################################
