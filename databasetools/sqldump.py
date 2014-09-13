@@ -8,7 +8,7 @@ import sqlite3
 # how to import modules from directories other than the current working
 # directory. Hence, this code is
 '''UNSTABLE'''
-import scraper.Classes
+import bin.Classes
 # from ..BeatNik.bin import Classes
 # from ..bin import Classes
 
