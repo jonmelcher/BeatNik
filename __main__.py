@@ -16,7 +16,10 @@ if __name__ == '__main__':
 
     my_song_data = ['Radiohead', 'Time of my life', 'The Very Best of Neil Young', 9001, 'Electronic', 'Spam Recording Inc', 2015, 'H#']
 
-    my_song = bin.music.Song(my_song_data)
+
+    my_song = beatnik.music.Song(my_song_data)
 
     db.insert_song(my_song, table_name)
+
     print db.fetch_artist(my_song.artist, table_name)
+
