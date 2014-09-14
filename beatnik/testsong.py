@@ -30,7 +30,7 @@ class TestSong(unittest.TestCase):
             song_data = random.choice(self.examples)
             p = music.Song(song_data)
             q = music.Song(song_data)
-            self.failUnless(p == q)
+            self.failUnlessEqual(p, q)
 
     def testSameSongDifferentData(self, insertion = '', trials = 1):
         'Tests __eq__ method of Song class.'
@@ -41,7 +41,7 @@ class TestSong(unittest.TestCase):
             p = music.Song(song_data)
             song_data[random.randint(2,7)] = insertion
             q = music.Song(song_data)
-            self.failUnless(p == q)
+            self.failUnlessEqual(p, q)
 
     def testDifferentSongs(self, trials = 1):
         'Tests __eq__ method of Song class.'
@@ -51,7 +51,7 @@ class TestSong(unittest.TestCase):
             altered_data = [x for x in song_data]
             altered_data[0], altered_data[1] = altered_data[1], altered_data[0]
             q = music.Song(altered_data)
-            self.failIf(p == q)
+            self.failIfEqual(p, q)
 
     def testEmptySong(self, trials = 1):
         'Tests __nonzero__ method of Song class.'
@@ -99,6 +99,26 @@ class TestSong(unittest.TestCase):
             except Exception as e:
                 self.failIf(True)
         return
+
+    # Append test to front to run if main.  Generalizes other tests.
+    def GeneralArgumentError(self, args, function, instance = None):
+        'Tests functions of Song class for an ArgumentError. args are inputs'
+        'for function and instance is an instantiation of the parent class'
+        'args should be in form [[arg]] to avoid conditions in code.'
+        for arg in args:
+            if not instance:
+                try:
+                    y = function(*arg)
+                except Exception as e:
+                    continue
+            else:
+                try:
+                    instance.function(*arg)
+                except Exception as e:
+                    continue
+            self.failIf(True)
+        return
+
 
 if __name__ == '__main__':
     unittest.main()
