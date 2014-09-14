@@ -190,6 +190,8 @@ class BPMDB(object):
                 for song in songs:
                     logfile.write('\n' + ', '.join(song.data))
 
+        return songs
+
 
     def __repr__(self):
         return 'Scraper Class for http://www.BPMdatabase.com.'
@@ -244,9 +246,9 @@ class AudioKC(object):
                                                         concatted_song)
             #song_data is in the form [title, artist, key, bpm] so must
             #convert to a valid form for Song class.
-            formatted_song_data = [song_data[1], song_data[0], 'NULL',
-                                   song_data[3], 'Null'      , 'Null',
-                                   'Null'      , song_data[2]]
+            formatted_song_data = [song_data[1], song_data[0], '',
+                                   song_data[3],           '', '',
+                                             '', song_data[2]]
             songs.append(music.Song(formatted_song_data))
 
         return songs

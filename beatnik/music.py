@@ -64,9 +64,11 @@ class Song(object):
     def __eq__(self, other):
         'Method for determining equality of songs.'
         'Type: Song -> Song -> Bool'
-
+        #Requires at least song and artist to be equal
+        if self.data[:2] != other.data[:2]:
+            return False
         for i, element in enumerate(self.data):
-            if element != other.data[i] and 'Null' not in [element, other.data[i]]:
+            if element != other.data[i] and '' not in [element, other.data[i]]:
                 return False
         return True
 
@@ -76,9 +78,8 @@ class Song(object):
 
 
     def __nonzero__(self):  #Runs when bool(Song) is called eg. if Song():
-        for element in self.data:
-            if element != 'Null':
-                return True
+        if self.data[:2] == ['', '']:
+            return True
         return False
 
 
