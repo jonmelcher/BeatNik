@@ -60,7 +60,7 @@ class TestSong(unittest.TestCase):
             q = music.Song(['' for i in range(8)])
             self.failIf(not p and not q)
 
-    def testImproperInitArgument(self, args = [[],
+    def testBadInitArgument(self, args = [[],
                           ['' for i in range( 4) ],
                           ['' for i in range(10)]]):
         'Tests __init__ method of Song class.'
@@ -72,8 +72,33 @@ class TestSong(unittest.TestCase):
             self.failIf(True)
         return
 
+    def testBadChangeToArgument(self, args = [-1, 9]):
+        'Tests change_to method of Song class.'
+
+        p = music.Song(self.examples[0])
+        for arg in args:
+            try:
+                p.change_to(arg, 'No way Jose!')
+            except Exception as e:
+                continue
+            self.failIf(True)
+        return
+
+    def testValidMerge(self, trials = 1):
+        'Tests __add__ method of Song class.'
+        for i in xrange(trials):
+            data = random.choice(self.examples)
+            p = music.Song(data)
+            q = music.Song(data)
+            for j in xrange(3):
+               p.data[random.randint(2,7)] = ''
+               p.refresh(p.data)
+            try:
+                r = p + q
+                s = q + p
+            except Exception as e:
+                self.failIf(True)
+        return
+
 if __name__ == '__main__':
     unittest.main()
-
-
-

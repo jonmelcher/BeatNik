@@ -12,7 +12,7 @@ class Song(object):
 
     def __init__(self, song_data):
 
-        self.data     = song_data
+        self.data  = song_data
         self.refresh(song_data)
 
     def refresh(self, data):
@@ -23,7 +23,7 @@ class Song(object):
         Song.data order will be:
         [artist, title, album, BPM, genre, label, year, key]
         """
-        self.data = data
+        self.data   = data
         self.artist = self.data[0]
         self.title  = self.data[1]
         self.album  = self.data[2]
@@ -53,7 +53,7 @@ class Song(object):
             raise Exception('Songs must have same attributes or be \'Null\'')
 
         for i, element in enumerate(self.data):
-            if element == 'Null':
+            if element == '':
                 merged_song_data.append(element)
             else:
                 merged_song_data.append(other.data[i])
